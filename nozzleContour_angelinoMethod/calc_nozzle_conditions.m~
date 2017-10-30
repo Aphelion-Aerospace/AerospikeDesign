@@ -19,7 +19,6 @@ P = p_ratio.*p_0;
 %%
 res = 10;
 
-subplot(2,1,1)
 plot(x,r,'k-',x,r_e.*ones(size(x)),'k--',lip_coord(1),lip_coord(2),'kX');
 
 
@@ -38,23 +37,10 @@ for i = 1:length(x)
     X_char = [X_char; x_cline];
     Y_char = [Y_char; y_cline];
     T_char = [T_char; T_cline];
-    P_char = [P_char; P_cline];
+    P_chf
 end
 
-%contour(X_char',Y_char',T_char',100);
-contour(X_char',Y_char',P_char',1000);
+contour(X_char',Y_char',T_char',100);
 
-legend('Contour','Axisymmetric Centre','Nozzle Lip','Pressure Contour');
-
-hold off
-subplot(2,1,2)
-
-hold on
-plot(x,r,'k-',x,r_e.*ones(size(x)),'k--',lip_coord(1),lip_coord(2),'kX');
-
-contour(X_char',Y_char',T_char',1000);
-
-axis equal
 legend('Contour','Axisymmetric Centre','Nozzle Lip','Temperature Contour');
-
 hold off

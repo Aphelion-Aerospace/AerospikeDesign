@@ -1,4 +1,4 @@
-function [x,r,M] = angelino_nozzle_contour(r_e,r_b,M_e, gamma,points)
+function [x,r,M] = angelino_nozzle_contour(A_t,epsilon, r_e,gamma,points)
 % calculates contour of an aerospike engine using Angelino's method
 
 % given the exit radius, r_e, end of plug radius, r_b, desired exit mach
@@ -10,8 +10,12 @@ function [x,r,M] = angelino_nozzle_contour(r_e,r_b,M_e, gamma,points)
 % contour. Note, this method assumes the nozzle lip is located at (0,0)
 
 % estimating contour
-A_e = pi.*(r_e.^2-r_b.^2);
-A_t = A_e./expansion_ratio(M_e,gamma);
+A_e = A_t.*epsilon;
+
+
+r_b = sqrt(-A_e./pi + r_e.^2)
+
+[M_e,f_dummy] = fsolve(@(M) mach_expansion_ratio(M,1.4,epsilon),10);
 
 M = linspace(1,M_e,points);
 

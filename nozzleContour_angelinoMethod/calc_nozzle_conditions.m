@@ -1,12 +1,12 @@
 %% Design of nozzle + estimation of flow properties
 r_e = 0.15; % exit radius
-r_b = 0.05; % plub nozzle base radius
-M_e = 2.5; % desired exit mach number
-T_0 = 350; % chamber temperature(300 K)
-p_0 = 2e7; % ~200 bar
-gamma = 1.4; % ratio of specific heats
+A_t = 0.01; % plug nozzle throat area
+epsilon = 5.6; %expansion ratio
+T_0 = 2527.77; % chamber temperature(300 K)
+p_0 = 19.098; % ~200 bar
+gamma = 1.83; % ratio of specific heats
 
-[x,r,M] = angelino_nozzle_contour(r_e,r_b,M_e, gamma,100);
+[x,r,M] = angelino_nozzle_contour(A_t,epsilon, r_e,gamma,100);
 
 lip_coord = [0;0]; % note, angelino's method assumes nozzle lip is at (0,0)
 
@@ -58,3 +58,5 @@ axis equal
 legend('Contour','Axisymmetric Centre','Nozzle Lip','Temperature Contour');
 
 hold off
+
+csvwrite('aerospike_contour.csv',[x',M',T',P'])

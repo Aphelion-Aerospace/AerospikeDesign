@@ -1,4 +1,4 @@
-function [X,Y,theta,nu,M,mu] = anderson_nozzle_contour(A_t,epsilon, gamma,points)
+function [X,Y,theta,nu,M,mu,K_neg,K_pos] = anderson_nozzle_contour(A_t,epsilon, gamma,points)
 r_t = sqrt(A_t./pi);
 n = 7;
 
@@ -17,7 +17,7 @@ A_e = A_t.*epsilon;
 
 [M_e,f_dummy] = fsolve(@(M) mach_expansion_ratio(M,gamma,epsilon),10);
 
-
+M_e =2.4
 %% Initial expansion waves
 theta_init = linspace(0.375,18.375,n);
 
@@ -47,7 +47,11 @@ mu(n+1) = mu(n);
 K_neg(n+1) = K_neg(n);
 K_pos(n+1) = K_pos(n);
 
+[X(1),Y(1)] = line_int(0,0,0,theta(1),0,r_t);
 
+for i = 2:n
+    [X(i),Y(i)] = line_int(theta(i),0,r_t,1./2.*(theta(i-1)+theta(i)) + 1./2.*(mu(i-1)+mu(i)),X(i-1),Y(i-1))
+end
 [X(n+1),Y(n+1)] = line_int(1./2.*(18.375 + theta(n+1)),X(1),Y(1),1./2.*(theta(n+1)+theta(n))+1./2.*(mu(n+1)+mu(n)),X(n),Y(n))
 %%
 %centre line points

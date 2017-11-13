@@ -1,7 +1,7 @@
 %% Design of nozzle + estimation of flow properties
-r_e = 0.15; % exit radius
-A_t = 0.01; % plug nozzle throat area
-epsilon = 5.6; %expansion ratio
+r_e = 0.0762; % exit radius, check if this is diam. or radius
+A_t = 0.004; % plug nozzle throat area
+epsilon = 7; %expansion ratio
 T_0 = 2527.77; % chamber temperature(300 K)
 p_0 = 19.098; % ~200 bar
 gamma = 1.83; % ratio of specific heats

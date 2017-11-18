@@ -1,8 +1,13 @@
 import numpy as np 
 
+#### GASDYNAMICS V1.0
+
 # VARIABLE NOMENCLATURE:
 #	- M: mach number
 #	- nu: prandtl-meyer function
+#	- T: temperature
+#	- p: pressure
+#	- rho: density
 
 # EXPLICIT RELATIONS ##########################################
 

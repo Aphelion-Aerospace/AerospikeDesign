@@ -35,7 +35,7 @@ class bell_nozzle:
 		self.n = n
 
 		self.r_t = np.sqrt(A_t/np.pi)
-		self.r_t = 0.07
+		#self.r_t = 0.07
 		self.no_points = int(1/2*n*(n+3))
 		self.M_e = optimize.fsolve(lambda M: gd.expansion_ratio_zero(1,M,gamma,expansion_ratio),5) # should be edited to relate to expansion ratio
 
@@ -65,6 +65,8 @@ class bell_nozzle:
 		
 		self.T = T_c*T_ratio
 		self.P = p_c*p_ratio
+
+		self.truncate_nozzle()
 	def bell_fan_completion(self):
 		exp_fan = self.n-1
 		count = 0
@@ -131,16 +133,19 @@ class bell_nozzle:
 
 		self.X[n],self.Y[n] = calc_line_intr(np.tan(1/2*(self.theta_max + self.theta[n])),0,self.r_t,np.tan(self.theta[n-1]+self.mu[n-1]),self.X[n-1],self.Y[n-1])
 
+	def truncate_nozzle(self):
+		idx = self.X <= self.X.max()*0.7
+		self.Y = self.Y[idx]; self.X = self.X[idx]; self.M = self.M[idx]; self.theta = self.theta[idx]; self.K_n = self.K_n[idx]; self.K_p = self.K_p[idx]; self.mu = self.mu[idx]; self.T = self.T[idx]; self.P = self.P[idx]
 
 # END OF HELPER FUNCTIONS #############################
 
 expansion_ratio = 8.1273
-A_t = 0.3
+A_t = 0.00014
 p_c = 34.474
 T_c = 2833.63
 gamma = np.mean([1.2534,1.2844])
 
-n = 200 #no. of expansion waves
+n = 150 #no. of expansion waves
 
 no_points = 1/2*n*(n+3)
 
@@ -151,8 +156,10 @@ b1 = bell_nozzle(expansion_ratio,A_t,gamma,T_c,p_c,n)
 #plt.contour(b1.X,b1.Y,b1.P,200)
 #print(b1.T)
 
+#print(b1.T[0])
 
-
-plt.scatter(b1.X,b1.Y,c=b1.T,cmap=cm.hot)
+plt.scatter(b1.X,b1.Y,c=b1.T,cmap=cm.coolwarm)
+plt.colorbar()
+print(b1.X.max())
 plt.axis('equal')
 plt.show()

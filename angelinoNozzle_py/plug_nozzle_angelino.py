@@ -3,20 +3,21 @@ import gasdynamics as gd
 import matplotlib.pyplot as plt
 from scipy import optimize
 from scipy import interpolate
-# spline interpolation
-# tck = interpolate.splrep(x,y,a=0)
-# x_new = np.linspace...
-# ynew = interpolate.splev(xnew,tck,der=0); der = 1 ynew'
 from matplotlib import cm 
 
 class plug_nozzle:
-	def __init__(self,expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,n):
+	def __init__(self,expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n):
 		# input design parameters	
 		self.expansion_ratio = expansion_ratio
 		self.A_t = A_t
 		self.r_e = r_e
 		self.gamma = gamma
 		self.n = n
+
+		self.T_c = T_c
+		self.p_c = p_c
+		self.a_c = a_c
+		self.rho_c = rho_c
 
 		# calculated design parameters
 		self.A_e = self.A_t*self.expansion_ratio
@@ -36,7 +37,7 @@ class plug_nozzle:
 	def design_nozzle(self):	
 		# discrete contour design variables
 		self.M = np.linspace(1,self.M_e,self.n)	
-		self.A = A_t*gd.expansion_ratio(1,self.M,gamma)
+		self.A = self.A_t*gd.expansion_ratio(1,self.M,self.gamma)
 		self.alpha = gd.prandtl_meyer(self.M_e,self.gamma) - gd.prandtl_meyer(self.M,self.gamma) + gd.mach_angle(self.M)
 		self.l = (self.r_e - np.sqrt(np.abs(self.r_e**2 - (self.A*self.M*np.sin(self.alpha)/np.pi))))/np.sin(self.alpha)
 
@@ -60,10 +61,11 @@ class plug_nozzle:
 
 	def calc_flow_properties(self):
 		T_ratio,p_ratio,rho_ratio,a_ratio = gd.isentropic_ratios(0,self.M,self.gamma)
-		self.T = T_c*T_ratio
-		self.p = p_c*p_ratio	
-		self.a = a_c*a_ratio
+		self.T = self.T_c*T_ratio
+		self.p = self.p_c*p_ratio	
+		self.a = self.a_c*a_ratio
 		self.V = self.a*self.M	
+		self.rho = self.rho_c*rho_ratio
 
 	def arc_length_coord(self):
 		y_dummy = self.y[1:] - self.y[:-1]
@@ -80,33 +82,92 @@ class plug_nozzle:
 	def internal_compression(self):
 		pass
 
+
 ###
 # End of helper function / class descriptions
 ###
 
-# design for 30,000
+#design for 30,000
 
-r_e = 0.0762 # likely too large
-expansion_ratio = 8.1273
-A_t = r_e**2*np.pi/expansion_ratio # max expansion (r_b = 0, r_e**2 >= A_t*expansion_ratio/np.pi)
-gamma = np.mean([1.2534,1.2852])
-T_c = 2833.63
-p_c = 34.474
+# r_e = 0.072/2 #0.034 # likely too large
+# expansion_ratio = 6.64 #8.1273
+# A_t = r_e**2*np.pi/expansion_ratio # max expansion (r_b = 0, r_e**2 >= A_t*expansion_ratio/np.pi)
+# gamma = 1.2343# np.mean([1.2534,1.2852])
+# T_c = 2833.63
+# p_c = 34.474
+# rho_c = 3.3826
+# a_c = np.sqrt(gamma*(1-1/gamma)*200.07*T_c) 
 
-a_c = np.sqrt(1.2381*2.0007*(1-1/1.2381)*T_c) 
+# print('Sound speed: ' + str(a_c))
 
-plug1 = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,500)
+# plug1 = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,10000)
 
-plt.scatter(plug1.x,plug1.y,c=plug1.V,cmap=cm.coolwarm)
-plt.plot(plug1.lip_x,plug1.lip_y,'rx')
-plt.colorbar()
+# plt.plot(plug1.x,plug1.y, label='Aerospike Contour')#c=plug1.rho,cmap=cm.coolwarm)
+# plt.plot(plug1.lip_x,plug1.lip_y,'rx',label='Lip Location')
+# #plt.colorbar()
+# plt.plot([0,plug1.x.max()],[0,0], 'k--',label='Centre Line')
+# plt.legend()
+# print('Distance above r_t: ' + str(plug1.lip_y - plug1.y[0]))
+# plt.xlabel('x (m)')
+# plt.ylabel('r (m)')
 
-plt.axis('equal')
+# m = (plug1.lip_y - plug1.y[0])/(plug1.lip_x - plug1.x[0])
 
-print('radius of curvature near the throat: ' + str(2*np.sqrt((plug1.lip_x - plug1.x[0])**2 + (plug1.lip_y - plug1.y[0])**2)))
-print(plug1.T[0])
+# m = -1/m
 
-csv_array = np.array([plug1.x,plug1.y,plug1.s,plug1.p,plug1.T,plug1.M,plug1.A,plug1.a,plug1.V])
+# print('Flow angle at throat: ' + str(180/np.pi*np.tan(m)-180))
 
-np.savetxt('aerospike_contour.csv', csv_array.T, delimiter = ',')
-plt.show()
+# max_y = m*(-plug1.lip_x) + plug1.lip_y
+
+# # plt.plot(0,max_y,'gx')
+# plt.axis('equal')
+
+
+
+# print('radius of curvature near the throat: ' + str(2*np.sqrt((plug1.lip_x - plug1.x[0])**2 + (plug1.lip_y - plug1.y[0])**2)))
+
+# csv_array = np.array([plug1.x,plug1.y,plug1.s,plug1.p,plug1.T,plug1.M,plug1.A,plug1.a,plug1.V,plug1.rho])
+
+# np.savetxt('aerospike_contour.csv', csv_array.T, delimiter = ',')
+
+# ## plots of p,T,M,a,V,rho
+
+# fig1, ((ax1,ax2,ax3),(ax4,ax5,ax6)) = plt.subplots(2,3)
+
+# ax1.plot(plug1.x*100,plug1.p*100)
+# #ax1.set_xlabel('x (cm)')
+# ax1.set_ylabel('kPa')
+# ax1.set_title('Pressure on Contour Surface')
+# ax1.grid()
+
+# ax2.plot(plug1.x*100,plug1.T)
+# #ax2.set_xlabel('x (cm)')
+# ax2.set_ylabel('K')
+# ax2.set_title('Temperature on Contour Surface')
+# ax2.grid()
+
+# ax3.plot(plug1.x*100,plug1.M)
+# #ax3.set_xlabel('x (cm)')
+# ax3.set_ylabel('M')
+# ax3.set_title('Mach on Contour Surface')
+# ax3.grid()
+
+# ax4.plot(plug1.x*100,plug1.a)
+# ax4.set_xlabel('x (cm)')
+# ax4.set_ylabel('m/s')
+# ax4.set_title('Sound Speed on Contour Surface')
+# ax4.grid()
+
+# ax5.plot(plug1.x*100,plug1.V)
+# ax5.set_xlabel('x (cm)')
+# ax5.set_ylabel('m/s')
+# ax5.set_title('Velocity on Contour Surface')
+# ax5.grid()
+
+# ax6.plot(plug1.x*100,plug1.rho)
+# ax6.set_xlabel('x (cm)')
+# ax6.set_ylabel('KG/CU')
+# ax6.set_title('Density on Contour Surface')
+# ax6.grid()
+
+# plt.show()

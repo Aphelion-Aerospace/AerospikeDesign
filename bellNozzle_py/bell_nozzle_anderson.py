@@ -145,7 +145,7 @@ p_c = 34.474
 T_c = 2833.63
 gamma = np.mean([1.2534,1.2844])
 
-n = 150 #no. of expansion waves
+n = 7 #no. of expansion waves
 
 no_points = 1/2*n*(n+3)
 

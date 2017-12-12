@@ -12,13 +12,21 @@ import numpy as np
 # EXPLICIT RELATIONS ##########################################
 
 # Supersonic flow
-def mach_angle(M):
+def mach_angle(M,degrees=0):
 	# computes mach angle (M > 1)
-	return np.arcsin(1/M)
+	mu = np.arcsin(1/M)
+	if (degrees):
+		return mu*180/np.pi
+	else:
+		return mu
 
-def prandtl_meyer(M,gamma):
+def prandtl_meyer(M,gamma,degrees=0):
 	# computes prandtl-meyer function (M > 1)
-	return np.sqrt((gamma+1)/(gamma-1))*np.arctan(np.sqrt((gamma-1)/(gamma+1)*(M**2-1))) - np.arctan(np.sqrt(M**2-1))
+	nu = np.sqrt((gamma+1)/(gamma-1))*np.arctan(np.sqrt((gamma-1)/(gamma+1)*(M**2-1))) - np.arctan(np.sqrt(M**2-1))
+	if (degrees):
+		return nu*180/np.pi 
+	else:
+		return nu
 
 # Isentropic flow
 def isentropic_ratios(M_1,M_2,gamma):
@@ -33,6 +41,10 @@ def expansion_ratio(M_1,M_2,gamma):
 	# returns area of expansion ratio A_2/A_1
 	return M_1/M_2*((2+(gamma-1)*M_2**2)/(2+(gamma-1)*M_1**2))**((gamma+1)/(2*(gamma-1)))
 
+# Important rocket relations
+def PR_expansion_mach(PR,gamma):
+	# returns mach number given 
+	return np.sqrt(((PR)**((gamma-1)/gamma)-1)*2/(gamma-1))
 
 # IMPLICIT RELATIONS ##########################################
 def prandtl_meyer_zero(M,nu,gamma):
@@ -40,3 +52,38 @@ def prandtl_meyer_zero(M,nu,gamma):
 
 def expansion_ratio_zero(M_1,M_2,gamma,epsilon):
 	return M_1/M_2*((2+(gamma-1)*M_2**2)/(2+(gamma-1)*M_1**2))**((gamma+1)/(2*(gamma-1))) - epsilon
+
+# STANDARD ATMOSPHERE #########################################
+# constants declaration
+
+
+def standard_atmosphere(altitude):
+	# 1976 US Standard Atmosphere
+	ps = 101325
+	rhos = 1.225
+	Ts = 288.15
+
+	R = 287.0531
+	g_0 = 9.80665
+	a = -6.5/1000
+	earth_radius = 6.356766*10**6
+	h = earth_radius/(earth_radius + altitude)*altitude #geopotential alt.
+	#h = 20000
+	
+	if (h<=11000):
+	# gradient (troposphere) region
+		T_atm = Ts + a*h;
+		p_atm = ps*(T_atm/Ts)**-(g_0/(a*R))
+		rho_atm = rhos*(T_atm/Ts)**-(1+g_0/(a*R))
+	else:
+	# contant temperature (stratosphere)region ~20000m (65616.8ft), should check
+		# values at boundary
+		T_atm = Ts + a*11000
+		p1 = ps*(T_atm/Ts)**(-g_0/(a*R))
+		rho1 = rhos*(T_atm/Ts)**-(1+g_0/(a*R))
+
+		# values at elevation
+		p_atm = p1*np.exp(-g_0/(R*T_atm)*(h-11000))
+		rho_atm = rho1*np.exp(-g_0/(R*T_atm)*(h-11000))
+
+	return (p_atm,T_atm,rho_atm)

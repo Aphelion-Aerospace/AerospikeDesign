@@ -53,6 +53,9 @@ def prandtl_meyer_zero(M,nu,gamma):
 def expansion_ratio_zero(M_1,M_2,gamma,epsilon):
 	return M_1/M_2*((2+(gamma-1)*M_2**2)/(2+(gamma-1)*M_1**2))**((gamma+1)/(2*(gamma-1))) - epsilon
 
+def mach_angle_velocity_ratio(mu,W,gamma):
+	return np.sin(mu) - np.sqrt((gamma-1)/2*(1/W**2-1))
+
 # STANDARD ATMOSPHERE #########################################
 # constants declaration
 

@@ -6,13 +6,14 @@ from scipy import interpolate
 from matplotlib import cm 
 
 class plug_nozzle:
-	def __init__(self,expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n):
+	def __init__(self,expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 1):
 		# input design parameters	
 		self.expansion_ratio = expansion_ratio
 		self.A_t = r_e**2*np.pi/expansion_ratio
 		self.r_e = r_e
 		self.gamma = gamma
 		self.n = n
+		self.truncate_ratio = truncate_ratio
 
 		self.T_c = T_c
 		self.p_c = p_c
@@ -56,7 +57,7 @@ class plug_nozzle:
 		# based on: Marcello Onofri, "Plug Nozzles: Summary of Flow Features and Engine Performance", University of Rome, 01 Jan 2006, American Institue of Aeronautics and Astronautics
 
 		# Truncating to about 20% of the original length will produce and efficiency of of 0.82-0.97 for a pressure ratio of 8.9-200 (as opposed to 0.98-0.99 for full length nozzle)
-		idx = self.x <= self.x.max()#*0.2
+		idx = self.x <= self.x.max()*self.truncate_ratio#x.max()#*0.2
 		self.M = self.M[idx]; self.A = self.A[idx]; self.alpha = self.alpha[idx]; self.l = self.l[idx]; self.x= self.x[idx]; self.y = self.y[idx]; 
 
 	def calc_flow_properties(self):

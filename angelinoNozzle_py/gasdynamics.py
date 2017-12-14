@@ -43,7 +43,7 @@ def expansion_ratio(M_1,M_2,gamma):
 
 # Important rocket relations
 def PR_expansion_mach(PR,gamma):
-	# returns mach number given 
+	# returns mach number given pressure ratio
 	return np.sqrt(((PR)**((gamma-1)/gamma)-1)*2/(gamma-1))
 
 # IMPLICIT RELATIONS ##########################################

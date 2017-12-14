@@ -38,9 +38,9 @@ rho_c = 3.3826
 a_c = np.sqrt(gamma*(1-1/gamma)*200.07*T_c) 
 
 
-spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,10000)
+spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,10000,truncate_ratio = 0.2)
 
-tck = interpolate.splrep(spike.x,spike.y)
+#tck = interpolate.splrep(spike.x,spike.y)
 
 
 

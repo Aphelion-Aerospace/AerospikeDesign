@@ -437,26 +437,34 @@ class chr_mesh():
 
         # creating list of IDs of all points to be deleted from mesh
         for point in self.chr_array:
-            if point.x < self.chr_array[0].x:
+            if point.x < self.chr_array[0].x:# or point.y > 0:
                 del_ID.append(curr_ID)
+            curr_ID += 1
+
 
         # deleting IDs from lists
         self.chr_array = np.delete(self.chr_array,del_ID)
-
+        print(len(del_ID))
         
-        def clean_ID_list(ID_list,del_ID_list):
+        def clean_ID_list(initial_ID_list,del_ID_list):
+            ID_list = initial_ID_list.copy()
             rem_count = 0
+            del_list = []
             for i in range(len(ID_list)):
+                i = i-rem_count
                 if ID_list[i] in del_ID_list:
+                    print('bingo!')
                     ID_list.remove(ID_list[i])
                     rem_count += 1
                 else:
                     ID_list[i] -= rem_count
+            return ID_list
 
-        clean_ID_list(self.ID_jet_boundary,del_ID)
-        clean_ID_list(self.ID_contour_chr,del_ID)
+        self.ID_jet_boundary = clean_ID_list(self.ID_jet_boundary,del_ID)
+        self.ID_contour_chr = clean_ID_list(self.ID_contour_chr,del_ID)
 
     def compute_thrust(self,n):       
+        pass
         print(self.V_l)
         # constructing spline representation for jet boundary
         jet_bound_x = np.concatenate((np.array([self.spike.lip_x]),self.x[self.ID_jet_boundary[:-2]]))
@@ -541,7 +549,7 @@ plt.axis('equal')
 
 MOC_mesh = chr_mesh(spike,gamma,9000,50,spike.x.max(),plot_chr=1)
 
-
+plt.plot(MOC_mesh.x,MOC_mesh.y,'ro')
 MOC_mesh.compute_thrust(100)
 #plt.plot(MOC_mesh.x[MOC_mesh.ID_contour_chr],MOC_mesh.y[MOC_mesh.ID_contour_chr],'bx')
 

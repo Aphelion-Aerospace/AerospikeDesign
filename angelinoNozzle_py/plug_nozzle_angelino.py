@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy import optimize
 from scipy import interpolate
 from matplotlib import cm 
+import os
 
 class plug_nozzle:
 	def __init__(self,expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 1):
@@ -26,7 +27,7 @@ class plug_nozzle:
 		self.M_e = optimize.fsolve(lambda M: gd.expansion_ratio_zero(1,M,self.gamma,self.expansion_ratio),5)
 
 		# DESIGN OF NOZZLE, FUNCTION ORDER IS IMPORTANT
-
+		# NON-OPTIONAL FUNCTION RUNS
 		self.design_nozzle()
 
 		self.truncate_nozzle()
@@ -35,6 +36,11 @@ class plug_nozzle:
 
 		self.arc_length_coord()
 
+		# OPTIONAL FUNCTION CONSTANTS
+		self.converge_section = 0 # whether the converging section has been designed
+
+
+	## NON-OPTIONAL FUNCTIONS
 	def design_nozzle(self):	
 		# discrete contour design variables
 		self.M = np.linspace(1,self.M_e,self.n)	
@@ -80,9 +86,72 @@ class plug_nozzle:
 		for i in range(1,s_dummy.shape[0]):
 			self.s[i] = s_dummy[i] + self.s[i-1]
 
-	def internal_compression(self):
-		pass
+	## OPTIONAL-FUNCTIONS
+	def define_compression(self,r1,r2,slope,conv_length,n):
+		self.converge_section = 1
+		tck = interpolate.splrep(self.x,self.y)
 
+		alpha = np.arctan(-1/interpolate.splev(self.x[0],tck,der=1))
+
+		x1 = -r1*np.cos(alpha); x2 = x1 
+
+		y1 = self.y[0]-r1*np.sin(alpha)
+
+		y2 = r1 + y1 - r2
+
+		beta = np.arctan(-1/slope)+np.pi
+
+		x_str_bnd = x2 + r2*np.cos(beta)
+
+		y_str_bnd = y2 + r2*np.sin(beta)
+
+		def conv_geom(x):
+			if (x > x1):
+				theta = np.arccos((x-x1)/r1)
+				y = r1*np.sin(theta) + y1
+			elif (x > x_str_bnd):
+				theta = np.arccos((x-x2)/r2)
+				y = r2*np.sin(theta) + y2
+			else:
+				y = slope*(x-x_str_bnd) + y_str_bnd
+
+			return y
+
+		x_init = x_str_bnd - np.sqrt(conv_length**2/(1+slope**2))
+
+		self.conv_x = np.linspace(x_init,self.x[0],n)
+		self.conv_y = np.ones(self.conv_x.shape)
+		for i in range(len(self.conv_x)):
+			self.conv_y[i] = conv_geom(self.conv_x[i])
+		#print(self.conv_x)
+
+	def plot_contour(self,ax):
+
+		if (self.converge_section):
+			ax.plot(self.conv_x,self.conv_y)
+
+		ax.plot(self.x,self.y)
+		ax.plot(self.lip_x,self.lip_y,'rx')
+		ax.plot(self.x,np.zeros(self.x.shape),'k--')
+
+	def save_to_csv(self):
+		if not os.path.exists('plug_csv'):
+			os.makedirs('plug_csv')
+
+		csv_array = np.array([self.x,self.y,self.s,self.p,self.T,self.M,self.A,self.a,self.V,self.rho])
+		np.savetxt('plug_csv/aerospike_diverge_contour.csv', csv_array.T, delimiter = ',')
+		with open('plug_csv/aerospike_diverge_contour.csv','r') as original: data = original.read()
+		with open('plug_csv/aerospike_diverge_contour.csv','w') as modified: modified.write('x,y,s,p,T,M,A,a,V,rho\n' + data)
+
+		csv_array = np.array([[self.lip_x],[self.lip_y]])		
+		np.savetxt('plug_csv/aerospike_lip_coordinates.csv',csv_array.T,delimiter =',')
+		with open('plug_csv/aerospike_lip_coordinates.csv','r') as original: data = original.read()
+		with open('plug_csv/aerospike_lip_coordinates.csv','w') as modified: modified.write('lip x,lip y\n' + data)
+
+		csv_array = np.array([self.conv_x,self.conv_y])
+		np.savetxt('plug_csv/aerospike_converge_contour.csv', csv_array.T,delimiter = ',')
+		with open('plug_csv/aerospike_converge_contour.csv','r') as original: data = original.read()
+		with open('plug_csv/aerospike_converge_contour.csv','w') as modified: modified.write('Converging x,Converging y\n' + data)
 
 ###
 # End of helper function / class descriptions

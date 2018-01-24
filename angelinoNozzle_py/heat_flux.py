@@ -5,21 +5,9 @@ import matplotlib.pyplot as plt
 from plug_nozzle_angelino import plug_nozzle
 from math import pi
 
-#input variables from NASA CEA in metric units:
-Pr=0.55645 #average throat to exit Prandtl's number
-Cp=1.724 #[KJ/KG-K] average throat to exit constant pressure heat capacity
-Gamma=1.2689 #average throat to exit ratio of specific heat
-c=0.003883468 #[millipoise/K^w] viscocity to temperature coefficient
-w=0.678083301 #viscocity to temperature exponent
-To=2833 #[K] stagnation/chamber temperature
-
-#user input variable in metric units:
-T_w=700 #[K] desired temperature of nozzle 
-
-
-def heat_generated(Pr,Cp,Gamma,c,W,To,spike)
+def heat_flux(Pr,Cp,Gamma,c,w,To,T_w,spike):
     class heat_transfer:
-        def __init__(self,pr,cp,gamma,c,w,To,T_w,s,r,M,u,rho,T_inf):
+        def __init__(self,pr,cp,gamma,c,w,To,T_w,spike):
             #input parameters and unit conversion if needed
             self.pr=pr
             self.cp=cp*0.238845 #[Btu/lb-R]
@@ -28,12 +16,12 @@ def heat_generated(Pr,Cp,Gamma,c,W,To,spike)
             self.w=w
             self.To=To*1.8 #[R]
             self.T_w=T_w*1.8 #[R]
-            self.s=s*3.28084 #[ft] nozzle wall length
-            self.r=r*3.28084 #[ft] nozzle radius
-            self.M=M #Mach number
-            self.u=u*3.28084 #[ft] free stream velocity
-            self.rho=rho*0.062428 #[lb/ft^3] free stream density
-            self.T_inf=T_inf*1.8 #[R] free stream temperature
+            self.s=spike.s*3.28084 #[ft] nozzle wall length
+            self.r=spike.y*3.28084 #[ft] nozzle radius
+            self.M=spike.M #Mach number
+            self.u=spike.V*3.28084 #[ft] free stream velocity
+            self.rho=spike.rho*0.062428 #[lb/ft^3] free stream density
+            self.T_inf=spike.T*1.8 #[R] free stream temperature
 
             #calculate additonal parameters
             self.mu=self.c*(self.T_inf**self.w) #[lb/ft-s] free stream viscocity
@@ -66,9 +54,8 @@ def heat_generated(Pr,Cp,Gamma,c,W,To,spike)
             self.h3_in=self.h3/144 #[BTU/in^2-sec-R] unit conversion to in^2
             self.h3_m=self.h3*20441.748028012 #[W/m^2-K] unit conversion to metric
 
-    heat=heat_transfer(Pr,Cp,Gamma,c,w,To,T_w,spike.s,spike.y,spike.M,spike.V,spike.rho,spike.T)
-
-
+    heat=heat_transfer(Pr,Cp,Gamma,c,w,To,T_w,spike)
+    #spike.s,spike.y,spike.M,spike.V,spike.rho,spike.T)
     #set the first 0.4mm h3 to be the same as the h3 at location 0.4mm, because h3 approached inf at leading edge
     i=1
     while i < 277:
@@ -82,14 +69,14 @@ def heat_generated(Pr,Cp,Gamma,c,W,To,spike)
         i=i+1
 
     #compute total heat flux
-    return total_q=np.sum(q) #[W]
+    return np.sum(q) #[W]
 
-print("Total heat flux ="+ str(total_q)+ "Watt")
+# print("Total heat flux ="+ str(total_q)+ "Watt")
 
-csv_array = np.array([heat.h3_in,heat.h3_m]) #export heat transfer coefficient to excel
-np.savetxt('heat_transfer_coefficient.csv', csv_array.T, delimiter = ',')
+# csv_array = np.array([heat.h3_in,heat.h3_m]) #export heat transfer coefficient to excel
+# np.savetxt('heat_transfer_coefficient.csv', csv_array.T, delimiter = ',')
 
-plt.plot(spike.x[1:]*100,heat.h3_m[1:])
-plt.ylabel('Heat Transfer Coefficient (W/m^2-K)')
-plt.xlabel('Nozzle length (cm)')
-plt.show()
+# plt.plot(spike.x[1:]*100,heat.h3_m[1:])
+# plt.ylabel('Heat Transfer Coefficient (W/m^2-K)')
+# plt.xlabel('Nozzle length (cm)')
+# plt.show()

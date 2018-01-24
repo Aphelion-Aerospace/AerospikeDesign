@@ -1,5 +1,5 @@
 import numpy as np 
-
+from copy import copy
 #### GASDYNAMICS V1.0
 
 # VARIABLE NOMENCLATURE:
@@ -62,6 +62,7 @@ def mach_angle_velocity_ratio(mu,W,gamma):
 
 def standard_atmosphere(altitude):
 	# 1976 US Standard Atmosphere
+
 	ps = 101325
 	rhos = 1.225
 	Ts = 288.15
@@ -70,23 +71,34 @@ def standard_atmosphere(altitude):
 	g_0 = 9.80665
 	a = -6.5/1000
 	earth_radius = 6.356766*10**6
-	h = earth_radius/(earth_radius + altitude)*altitude #geopotential alt.
-	#h = 20000
-	
-	if (h<=11000):
-	# gradient (troposphere) region
-		T_atm = Ts + a*h;
-		p_atm = ps*(T_atm/Ts)**-(g_0/(a*R))
-		rho_atm = rhos*(T_atm/Ts)**-(1+g_0/(a*R))
+	altitude = copy(altitude)
+	p_atm_range = copy(altitude)
+	T_atm_range = copy(altitude)
+	rho_atm_range = copy(altitude)
+	for i in range(len(altitude)):
+		h = earth_radius/(earth_radius + altitude[i])*altitude[i] #geopotential alt.
+		#h = 20000
+
+		if (h<=11000):
+		# gradient (troposphere) region
+			T_atm = Ts + a*h;
+			p_atm = ps*(T_atm/Ts)**-(g_0/(a*R))
+			rho_atm = rhos*(T_atm/Ts)**-(1+g_0/(a*R))
+		else:
+		# contant temperature (stratosphere)region ~20000m (65616.8ft), should check
+			# values at boundary
+			T_atm = Ts + a*11000
+			p1 = ps*(T_atm/Ts)**(-g_0/(a*R))
+			rho1 = rhos*(T_atm/Ts)**-(1+g_0/(a*R))
+
+			# values at elevation
+			p_atm = p1*np.exp(-g_0/(R*T_atm)*(h-11000))
+			rho_atm = rho1*np.exp(-g_0/(R*T_atm)*(h-11000))
+		p_atm_range[i] = p_atm
+		T_atm_range[i] = T_atm 
+		rho_atm_range[i] = rho_atm 
+
+	if len(altitude) > 1:
+		return (p_atm_range,T_atm_range,rho_atm_range)
 	else:
-	# contant temperature (stratosphere)region ~20000m (65616.8ft), should check
-		# values at boundary
-		T_atm = Ts + a*11000
-		p1 = ps*(T_atm/Ts)**(-g_0/(a*R))
-		rho1 = rhos*(T_atm/Ts)**-(1+g_0/(a*R))
-
-		# values at elevation
-		p_atm = p1*np.exp(-g_0/(R*T_atm)*(h-11000))
-		rho_atm = rho1*np.exp(-g_0/(R*T_atm)*(h-11000))
-
-	return (p_atm,T_atm,rho_atm)
+		return (p_atm,T_atm,rho_atm)

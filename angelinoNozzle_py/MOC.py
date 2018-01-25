@@ -484,6 +484,8 @@ class chr_mesh():
         x_plane = np.ones(n,)*self.x[self.ID_contour_chr[-1]];
         y_points = np.linspace(0,interpolate.splev(self.x[self.ID_contour_chr[-1]],tck_jet_bound),n);
 
+        x_plane = x_plane[:-1]; y_points = y_points[:-1]
+        plt.plot(x_plane,y_points,'ro')
         # constructing rbf functions for interpolation of properties
         V_grid = interpolate.griddata((self.x,self.y),self.V,(x_plane,y_points),method=approx_method) # nearest and cubic may also work 
         T_grid = interpolate.griddata((self.x,self.y),self.T,(x_plane,y_points),method=approx_method)
@@ -492,9 +494,12 @@ class chr_mesh():
         P_grid = interpolate.griddata((self.x,self.y),self.p,(x_plane,y_points),method=approx_method)
         #computing thrust
         Ve_grid = V_grid*np.cos(theta_grid) # V*cos(theta)*r *dr 
+
+        # fig1, (ax1) = plt.subplots(1,1)
+        # vel_plot = ax1.scatter(y_points,Ve_grid)
+
         A = y_points*2*np.pi
         thrust_grid = rho_grid*Ve_grid**2*A ## CHECK THIS!!!!!!!
-
         thrust_momentum = np.trapz(thrust_grid,y_points) # check with emerson
         thrust_pressure = np.trapz(2*np.pi*(P_grid-self.p_atm)*y_points,y_points) # check with emerson
 

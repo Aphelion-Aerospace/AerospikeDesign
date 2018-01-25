@@ -459,7 +459,7 @@ class chr_mesh():
 
         # creating list of IDs of all points to be deleted from mesh
         for point in self.chr_array:
-            if point.x < self.chr_array[0].x or point.y > 0 or point.x > self.chr_array[self.ID_contour_chr[-1]].x*self.downstream_factor or np.isnan(point.x) or point.x > self.spike.length:
+            if point.x < self.chr_array[0].x or point.y > 0 or point.x > self.chr_array[self.ID_contour_chr[-1]].x*self.downstream_factor or np.isnan(point.x):
                 del_ID.append(curr_ID)
             curr_ID += 1
 

@@ -1,6 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 import scipy.optimize
+import multiprocessing as mp
 import gasdynamics as gd
 from heat_flux import heat_flux
 from plug_nozzle_angelino import plug_nozzle 
@@ -20,8 +21,48 @@ class CEA_constants():
 		self.c = c
 		self.w = w
 
-def COST_FNC(design_alt,truncate_ratio,T_w,CEA,r_e,alpha,beta,n):
+def compute_thrust_over_range(plug_nozzle_class,alt_range,gamma,send_end,downstream_factor=1.2,chr_mesh_n=50):
+	## INPUTS: plug_nozzle class object, gamma, numpy array containing altitude range over which to compute the thrust,
+	##		   the downstream_factor (default 1.2) for the characteristic mesh calculations, and chr_mesh_n (default 50), the number 
+	##		   of expansion waves for the MOC_mesh
 
+	## OUTPUTS: numpy array of thrusts for altitude range for given inputs
+	thrust_range = np.zeros(alt_range.shape)
+	for i in range(alt_range.shape[0]):
+		MOC_mesh = MOC.chr_mesh(plug_nozzle_class,gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor)
+		thrust_range[i] = MOC_mesh.compute_thrust('nearest',10)
+
+	send_end.send(thrust_range)
+
+def multicore_thrust_compute(plug_nozzle_class,altitude_range,gamma,downstream_factor=1.2,chr_mesh_n=50,no_core=1):
+	proc_list = []
+	pipe_list =[]
+
+	alt_range_split = np.split(altitude_range,no_core)
+
+	for i in range(no_core):
+		recv_end, send_end = mp.Pipe(False)
+		args = (plug_nozzle_class,alt_range_split[i],gamma,send_end,1.2,50)
+		proc = mp.Process(target=compute_thrust_over_range, args = args)
+		proc_list.append(proc)
+		pipe_list.append(recv_end)
+		proc.start()
+
+	for proc in proc_list:
+		proc.join()
+
+	thrust_range = [x.recv() for x in pipe_list]
+
+	thrust_range = np.concatenate(thrust_range)
+
+	# for thread in threads:
+	# 	thread.map
+
+	return thrust_range
+
+def COST_FNC(design_alt,truncate_ratio,T_w,CEA,r_e,alpha,beta,n,no_core=4):
+
+	print("Design alt: " + str(design_alt) + ", Truncation: " + str(truncate_ratio))
 	### DESIGNING NOZZLE
 	(p_atm,T_atm,rho_atm) = gd.standard_atmosphere([design_alt])
 
@@ -40,21 +81,15 @@ def COST_FNC(design_alt,truncate_ratio,T_w,CEA,r_e,alpha,beta,n):
 
 	### CALCULATING COST
 	##	thurst estimation over altitude
-	alt_range = np.linspace(0,12000,30)
+	alt_range = np.linspace(0,12000,4*no_core)
 	(p_atm_r,T_atm_r,rho_atm_r) = gd.standard_atmosphere(alt_range)
 	#print(CEA.p_c/p_atm_r)
-	thrust_range = np.zeros(alt_range.shape)
-	for i in range (alt_range.shape[0]):
-		if i==10:
-			MOC_mesh = MOC.chr_mesh(spike,gamma,alt_range[i],50,downstream_factor=1.2,plot_chr=0)
-		else:
-			MOC_mesh = MOC.chr_mesh(spike,gamma,alt_range[i],50,downstream_factor=1.2,plot_chr=0)
-
-		thrust_range[i] = MOC_mesh.compute_thrust('nearest',10)
+	#thrust_range = multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=1.2,chr_mesh_n=50,no_core=4)
+	thrust_range = multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=1.2,chr_mesh_n=50,no_core=4)
 
 	work = np.trapz(thrust_range,alt_range)
-	plt.plot(alt_range,thrust_range,'o')
-	plt.show()
+	# plt.plot(alt_range,thrust_range,'o')
+	# plt.show()
 	## heat transfer required
 
 	total_heat_flux = heat_flux(CEA.Pr,CEA.cp,CEA.gamma,CEA.c,CEA.w,CEA.T_c,T_w,spike)
@@ -91,8 +126,8 @@ T_w=600 #[K] desired temperature of nozzle
 ## CONSTANTS OF SIM
 alpha = 0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
 beta = 0
-design_alt = 9000
-truncate_ratio = 0.2 # bounds on truncate < 0.1425
+design_alt = 6000
+truncate_ratio = 1.0 # bounds on truncate < 0.1425
 
 CEA = CEA_constants(gamma,T_c,p_c,rho_c,a_c,Pr,cp,c,w)
 
@@ -117,7 +152,7 @@ print(cost_lambda([design_alt,truncate_ratio]))
 # res = scipy.optimize.minimize(cost_lambda,[design_alt,truncate_ratio],constraints = cons)
 
 
-# minmizer_kwargs = {'constraints':cons}
+minmizer_kwargs = {"constraints":cons}
 
-# res = scipy.optimize.basinhopping(cost_lambda,[design_alt,truncate_ratio],minimizer_kwargs=minmizer_kwargs)
-# print(res)
+res = scipy.optimize.basinhopping(cost_lambda,[design_alt,truncate_ratio],minimizer_kwargs=minmizer_kwargs)
+print(res)

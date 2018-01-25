@@ -15,7 +15,7 @@ a_c = np.sqrt(gamma*(1-1/gamma)*200.07*T_c)
 n = 1000
 
 # design plug nozzle
-spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 1)
+spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 0.5)
 
 MOC_mesh = chr_mesh(spike,gamma,5278,30,downstream_factor=1.2,plot_chr=1)
 

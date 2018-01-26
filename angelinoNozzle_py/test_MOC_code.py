@@ -66,13 +66,22 @@ num_wave = num_wave[6*no_core:]
 
 altitude = 6000
 # design plug nozzle
-spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 1.0)
+spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 0.2)
 
-thrust = multicore_thrust_compute(spike,gamma,altitude,num_wave,1.2,no_core)
-# plt.plot(MOC_mesh.x[MOC_mesh.ID_contour_chr],MOC_mesh.y[MOC_mesh.ID_contour_chr])
+# thrust = multicore_thrust_compute(spike,gamma,altitude,num_wave,1.2,no_core)
 
-plt.plot(num_wave,thrust,'bo')
-# plt.plot(spike.x,spike.rho,'b--',MOC_mesh.x[MOC_mesh.ID_contour_chr],MOC_mesh.rho[MOC_mesh.ID_contour_chr],'r-')
+mesh = chr_mesh(spike,gamma,altitude,200,downstream_factor=1.2,plot_chr=0)
+
+
+plt.plot(mesh.x,mesh.y,'r.')
+mesh.compute_thrust('nearest',30)
+
+
+plt.axis('equal')
+
+plt.show()
+
+# plt.plot(num_wave,thrust,'bo')
+
 
 #plt.axis('equal')
-plt.show()

@@ -42,7 +42,7 @@ def multicore_thrust_compute(plug_nozzle_class,altitude_range,gamma,downstream_f
 
 	for i in range(no_core):
 		recv_end, send_end = mp.Pipe(False)
-		args = (plug_nozzle_class,alt_range_split[i],gamma,send_end,1.2,50)
+		args = (plug_nozzle_class,alt_range_split[i],gamma,send_end,1.2,chr_mesh_n)
 		proc = mp.Process(target=compute_thrust_over_range, args = args)
 		proc_list.append(proc)
 		pipe_list.append(recv_end)
@@ -85,11 +85,11 @@ def COST_FNC(design_alt,truncate_ratio,T_w,CEA,r_e,alpha,beta,n,no_core=4):
 	(p_atm_r,T_atm_r,rho_atm_r) = gd.standard_atmosphere(alt_range)
 	#print(CEA.p_c/p_atm_r)
 	#thrust_range = multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=1.2,chr_mesh_n=50,no_core=4)
-	thrust_range = multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=1.2,chr_mesh_n=50,no_core=4)
+	thrust_range = multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=1.2,chr_mesh_n=150,no_core=4)
 
 	work = np.trapz(thrust_range,alt_range)
-	# plt.plot(alt_range,thrust_range,'o')
-	# plt.show()
+	plt.plot(alt_range,thrust_range,'o')
+	plt.show()
 	## heat transfer required
 
 	total_heat_flux = heat_flux(CEA.Pr,CEA.cp,CEA.gamma,CEA.c,CEA.w,CEA.T_c,T_w,spike)
@@ -127,7 +127,7 @@ T_w=600 #[K] desired temperature of nozzle
 alpha = 0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
 beta = 0
 design_alt = 6000
-truncate_ratio = 1.0 # bounds on truncate < 0.1425
+truncate_ratio = 0.2 # bounds on truncate < 0.1425
 
 CEA = CEA_constants(gamma,T_c,p_c,rho_c,a_c,Pr,cp,c,w)
 
@@ -152,7 +152,7 @@ print(cost_lambda([design_alt,truncate_ratio]))
 # res = scipy.optimize.minimize(cost_lambda,[design_alt,truncate_ratio],constraints = cons)
 
 
-minmizer_kwargs = {"constraints":cons}
+# minmizer_kwargs = {"constraints":cons}
 
-res = scipy.optimize.basinhopping(cost_lambda,[design_alt,truncate_ratio],minimizer_kwargs=minmizer_kwargs)
-print(res)
+# res = scipy.optimize.basinhopping(cost_lambda,[design_alt,truncate_ratio],minimizer_kwargs=minmizer_kwargs)
+# print(res)

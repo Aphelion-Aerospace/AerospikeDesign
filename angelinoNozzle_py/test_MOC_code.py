@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing as mp
+import pickle
 from plug_nozzle_angelino import plug_nozzle
 from MOC import chr_mesh
 
@@ -17,24 +18,26 @@ n = 1000
 
 def thrust_curve(spike,gamma,altitude,num_wave,downstream_factor,send_end):
 
-	thrust = np.zeros(num_wave.shape)
+	thrust = [] #np.zeros(num_wave.shape)
 
 	for i in range(len(num_wave)):
-		print(num_wave[i])
+		#print(num_wave[i])
 		MOC_mesh = chr_mesh(spike,gamma,altitude,num_wave[i],downstream_factor=downstream_factor,plot_chr=0)
 		
-		thrust[i] = MOC_mesh.compute_thrust('cubic',100)
+		thrust.append(MOC_mesh)
 
-	send_end.send(thrust)
+		##
+		#thrust[i] = MOC_mesh.compute_thrust('cubic',100)
+
+	send_end.send(MOC_mesh)
 
 
 def multicore_thrust_compute(spike,gamma,altitude,num_wave,downstream_factor,no_core):
 	proc_list = []
 	pipe_list =[]
-
-	print(len(num_wave))
+	np.random.shuffle(num_wave)
 	num_wave_split = np.split(num_wave,no_core)
-
+	
 	for i in range(no_core):
 		recv_end, send_end = mp.Pipe(False)
 		args = (spike,gamma,altitude,num_wave_split[i],downstream_factor,send_end)
@@ -58,28 +61,32 @@ def multicore_thrust_compute(spike,gamma,altitude,num_wave,downstream_factor,no_
 
 	return thrust
 
-no_core = 4
+no_core = 8
 
-num_wave = np.arange(36*no_core); #num_wave = num_wave[29:]
+num_wave = np.arange(25*no_core); #num_wave = num_wave[29:]
 
-num_wave = num_wave[6*no_core:]
+num_wave = num_wave[4*no_core:]
 
 altitude = 6000
 # design plug nozzle
+
+
 spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 0.2)
 
-# thrust = multicore_thrust_compute(spike,gamma,altitude,num_wave,1.2,no_core)
+print("Computing meshes with " + str(no_core) + " cores")
+meshes = multicore_thrust_compute(spike,gamma,altitude,num_wave,1.2,no_core)
 
-mesh = chr_mesh(spike,gamma,altitude,200,downstream_factor=1.2,plot_chr=0)
-
-
-plt.plot(mesh.x,mesh.y,'r.')
-mesh.compute_thrust('nearest',30)
+# mesh = chr_mesh(spike,gamma,3483,200,downstream_factor=1.2,plot_chr=0)
 
 
-plt.axis('equal')
+#mesh.compute_thrust('nearest',30)
+print("Pickling result")
+with open('meshes.pkl','wb') as output:
+	pickle.dump(meshes,output,pickle.HIGHEST_PROTOCOL)
 
-plt.show()
+# with open('meshes.pkl','rb') as input:
+# 	meshes = pickle.load(input)
+
 
 # plt.plot(num_wave,thrust,'bo')
 

@@ -26,7 +26,7 @@ class chr_point():
         plt.plot(self.x,self.y,'bx')
         # will calculate other properties later (p etc.) to vectorize
 class chr_mesh():
-    def __init__(self,spike,gamma,altitude,n,downstream_factor=1.1,plot_chr=0):
+    def __init__(self,spike,gamma,altitude,n,downstream_factor=1.1,plot_chr=0,clean_mesh=1):
 
         self.spike =copy.copy(spike); self.gamma = gamma; self.altitude =altitude; self.n = n
 
@@ -204,7 +204,8 @@ class chr_mesh():
 
         ## END OF MOC SECTION #####
         # function order is important
-        self.clean_data()
+        if(clean_mesh):
+            self.clean_data()
         self.to_arrays()
         self.calc_flow_properties()
         #self.compute_thrust()
@@ -473,12 +474,21 @@ class chr_mesh():
 
     def compute_thrust(self,approx_method,n):       
         # # constructing spline representation for jet boundary
+
         jet_bound_x = np.concatenate((np.array([self.spike.lip_x]),self.x[self.ID_jet_boundary]))
         jet_bound_y = np.concatenate((np.array([self.spike.lip_y]),self.y[self.ID_jet_boundary]))
 
+        # filter for uniques
+        jet_bound_x, indices = np.unique(jet_bound_x, return_index=True)
+        jet_bound_y = jet_bound_y[indices]
+
+        try:
         #constructing jet boundary spline
-        tck_jet_bound = interpolate.splrep(jet_bound_x,jet_bound_y)
-      
+            tck_jet_bound = interpolate.splrep(jet_bound_x,jet_bound_y)
+        except TypeError:
+            print(self.altitude)
+            print(str(jet_bound_x))
+            print(str(jet_bound_y))
        
         # constructing plane on which to evaluate expanded gas properties
         x_plane = np.ones(n,)*self.x[self.ID_contour_chr[-1]];

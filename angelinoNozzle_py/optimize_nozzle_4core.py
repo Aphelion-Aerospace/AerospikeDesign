@@ -29,6 +29,7 @@ def compute_thrust_over_range(plug_nozzle_class,alt_range,gamma,send_end,downstr
 	## OUTPUTS: numpy array of thrusts for altitude range for given inputs
 	thrust_range = np.zeros(alt_range.shape)
 	for i in range(alt_range.shape[0]):
+		print(alt_range[i])
 		MOC_mesh = MOC.chr_mesh(plug_nozzle_class,gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor)
 		thrust_range[i] = MOC_mesh.compute_thrust('nearest',10)
 
@@ -42,7 +43,7 @@ def multicore_thrust_compute(plug_nozzle_class,altitude_range,gamma,downstream_f
 
 	for i in range(no_core):
 		recv_end, send_end = mp.Pipe(False)
-		args = (plug_nozzle_class,alt_range_split[i],gamma,send_end,1.2,chr_mesh_n)
+		args = (plug_nozzle_class,alt_range_split[i],gamma,send_end,downstream_factor,chr_mesh_n)
 		proc = mp.Process(target=compute_thrust_over_range, args = args)
 		proc_list.append(proc)
 		pipe_list.append(recv_end)
@@ -82,10 +83,11 @@ def COST_FNC(design_alt,truncate_ratio,T_w,CEA,r_e,alpha,beta,n,no_core=4):
 	### CALCULATING COST
 	##	thurst estimation over altitude
 	alt_range = np.linspace(0,12000,4*no_core)
+	np.random.shuffle(alt_range)
 	(p_atm_r,T_atm_r,rho_atm_r) = gd.standard_atmosphere(alt_range)
 	#print(CEA.p_c/p_atm_r)
 	#thrust_range = multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=1.2,chr_mesh_n=50,no_core=4)
-	thrust_range = multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=1.2,chr_mesh_n=150,no_core=4)
+	thrust_range = multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=2,chr_mesh_n=175,no_core=no_core)
 
 	work = np.trapz(thrust_range,alt_range)
 	plt.plot(alt_range,thrust_range,'o')
@@ -132,8 +134,7 @@ truncate_ratio = 0.2 # bounds on truncate < 0.1425
 CEA = CEA_constants(gamma,T_c,p_c,rho_c,a_c,Pr,cp,c,w)
 
 ## CONVERTING TO OPTIMIZABLE FUNCTION
-cost_lambda = lambda X: COST_FNC(X[0],X[1],T_w,CEA,r_e,alpha,beta,n)
-
+cost_lambda = lambda X: COST_FNC(X[0],X[1],T_w,CEA,r_e,alpha,beta,n,no_core=8)
 def min_design_alt(X):
 	return X[0] - 3000
 

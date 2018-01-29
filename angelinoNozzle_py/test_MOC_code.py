@@ -74,15 +74,27 @@ altitude = 6000
 spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 0.2)
 
 print("Computing meshes with " + str(no_core) + " cores")
-meshes = multicore_thrust_compute(spike,gamma,altitude,num_wave,1.2,no_core)
+# meshes = multicore_thrust_compute(spike,gamma,altitude,num_wave,1.2,no_core)
 
-# mesh = chr_mesh(spike,gamma,3483,200,downstream_factor=1.2,plot_chr=0)
+mesh = chr_mesh(spike,gamma,6000,50,downstream_factor=1.2,plot_chr=1)
+contour_line, = plt.plot(spike.x,spike.y,'b', label = 'Nozzle Contour')
+centre_line, = plt.plot(spike.x,np.zeros(spike.x.shape),'k--',label = 'Centre Line')
+lip_coord, = plt.plot(spike.lip_x,spike.lip_y,'rx', label = 'Lip Location')
 
+
+
+plt.legend(handles = [contour_line,centre_line,lip_coord])
+plt.xlabel('(m)')
+plt.ylabel('(m)')
+print(mesh.PR)
+#plt.title('Sea Level (PR = ' + str(np.round(mesh.PR,0)) + ') Characteristic Mesh')
+plt.axis('equal')
+plt.show()
 
 #mesh.compute_thrust('nearest',30)
-print("Pickling result")
-with open('meshes.pkl','wb') as output:
-	pickle.dump(meshes,output,pickle.HIGHEST_PROTOCOL)
+# print("Pickling result")
+# with open('meshes.pkl','wb') as output:
+# 	pickle.dump(meshes,output,pickle.HIGHEST_PROTOCOL)
 
 # with open('meshes.pkl','rb') as input:
 # 	meshes = pickle.load(input)

@@ -385,8 +385,6 @@ class chr_mesh():
         phi = np.arctan(interpolate.splev(self.spike.x[0], self.tck, der=1))
         PHI = (-0.2*phi**4-5.89*phi**2+20179.84)/(phi**4+20179.84)
 
-        
-
         return self.p_atm*(0.05 + 0.967)**PHI
 
     def on_nozzle_contour(self,chr_point_obj):

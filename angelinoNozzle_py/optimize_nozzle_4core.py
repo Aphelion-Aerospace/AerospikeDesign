@@ -170,7 +170,7 @@ spike_init = design_angelino_nozzle(design_alt,truncate_ratio,CEA,r_e)
 
 spike_opt = copy.deepcopy(spike_init)
 
-def cost_opt(params) : return COST_FNC(params,spike_opt,T_w,CEA,alpha,beta,chr_mesh_n=120,no_core=8) # (x_vals,y_vals,spike,T_w,CEA,alpha,beta,chr_mesh_n=145,no_core=4)
+def cost_opt(params) : return COST_FNC(params,spike_opt,T_w,CEA,alpha,beta,chr_mesh_n=120,no_core=4) # (x_vals,y_vals,spike,T_w,CEA,alpha,beta,chr_mesh_n=145,no_core=4)
 
 # print(cost_opt([spike_opt.x,spike_opt.y]))
 

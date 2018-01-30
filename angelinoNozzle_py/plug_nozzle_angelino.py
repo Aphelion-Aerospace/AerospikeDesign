@@ -51,13 +51,17 @@ class plug_nozzle:
 		self.x = self.l*np.cos(self.alpha)
 		self.y = self.l*np.sin(self.alpha)
 
+		self.centre_spike()
+		
+		self.length = self.x.max()
+
+	def centre_spike(self):
 		self.lip_x = -self.x.min()
 		self.lip_y = self.r_e 
 
 		self.x = self.x - self.x.min()
 		self.y = self.r_e - self.y
-		
-		self.length = self.x.max()
+
 
 	def truncate_nozzle(self):
 		# based on: Marcello Onofri, "Plug Nozzles: Summary of Flow Features and Engine Performance", University of Rome, 01 Jan 2006, American Institue of Aeronautics and Astronautics
@@ -87,6 +91,49 @@ class plug_nozzle:
 			self.s[i] = s_dummy[i] + self.s[i-1]
 
 	## OPTIONAL-FUNCTIONS
+	def update_contour(self,x,y,M,x_centre_spike=0):
+		# Updates the spike contour with new (x,y) points with known values of M at each point
+		self.x = x; self.y = y; self.M = M
+
+		# optionally centre spike about x-axis
+		if(x_centre_spike):
+			self.centre_spike()
+
+		# update flow properties based on isentropic expansion
+		self.calc_flow_properties()
+
+		# update arc length coordinates
+		self.arc_length_coord()
+
+		# update exit mach number
+		self.M_e = M[-1]
+
+		# update expansion ratio
+		self.expansion_ratio = gd.expansion_ratio(1,self.M_e)
+
+		self.A_t = self.r_e**2*np.pi/self.expansion_ratio
+		print("Warning, throat area update not complete, assumes perfect isentropic expansion from throat to exit")
+		
+		# update area estimation 
+		self.A = self.A_t*gd.expansion_ratio(1,self.M,self.gamma)
+		# update base radius
+		self.r_b = self.y[-1]
+
+		# update exit area
+		self.A_e = np.pi*(self.r_e**2-self.r_b**2)
+
+		if(self.converge_section):
+			print("Warning, congerence section not updated. Run self.converge_section(args) again to define a new convergence section.")
+
+
+	def calc_ideal_thrust(self,p_atm):
+		# calculates ideal thrust
+		# F = m_dot*V_e + (P_e - P_o)A_e
+		p_e = self.p[-1]
+
+		thrust = self.rho[0]*self.V[0]*self.A_t*self.V[-1] + (p_e-p_atm)*self.A_e
+		return thrust 
+
 	def define_compression(self,r1,r2,slope,conv_length,n):
 		self.converge_section = 1
 		tck = interpolate.splrep(self.x,self.y)

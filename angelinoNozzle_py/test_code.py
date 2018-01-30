@@ -1,5 +1,6 @@
 from plug_nozzle_angelino import plug_nozzle
 from MOC import chr_mesh
+import gasdynamics as gd 
 import numpy as np 
 import matplotlib.pyplot as plt
 
@@ -17,17 +18,23 @@ n = 1000
 
 
 spike = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,n,truncate_ratio = 1.0)
+alts = np.linspace(0,15000,100)
+p_atms,T_atms,rho_atms = gd.standard_atmosphere(alts)
 
-spike.y = spike.y*-1
-spike.lip_y = spike.lip_y*-1
+thrusts = np.zeros(p_atms.shape)
+
+for i in range(len(p_atms)):
+	thrusts[i] = spike.calc_ideal_thrust(p_atms[i])
+
+plt.plot(alts,thrusts)
 
 
-MOC_mesh = chr_mesh(spike,gamma,0,50,downstream_factor=1.2,plot_chr=1)
+# MOC_mesh = chr_mesh(spike,gamma,0,50,downstream_factor=1.2,plot_chr=1)
 
 #plt.plot(MOC_mesh.x,MOC_mesh.y,'ro')
 
 #plt.plot(MOC_mesh.x[MOC_mesh.ID_jet_boundary],MOC_mesh.y[MOC_mesh.ID_jet_boundary],'go-')
-MOC_mesh.compute_thrust('nearest',10)
+# MOC_mesh.compute_thrust('nearest',10)
 #plt.plot(MOC_mesh.x[MOC_mesh.ID_contour_chr],MOC_mesh.y[MOC_mesh.ID_contour_chr],'bo-')
 
 #plt.plot(MOC_mesh.x[MOC_mesh.ID_contour_chr[-1]],0,'bo')

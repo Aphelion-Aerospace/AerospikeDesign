@@ -1,0 +1,672 @@
+<html>
+<head>
+<TITLE>Aerolab help document</TITLE>
+
+<BODY background="#80C080" text="#800080" link="#3333FF" vlink="#3333FF">
+<font face="Arial">
+
+<A NAME="Contents"</A>
+<FONT SIZE="15" COLOR="#008080">Aerolab Help</FONT><FONT SIZE="4" COLOR="#400040"><BR>
+<B>- A Brief Introduction</B><BR>
+<BR>
+<A HREF="#Introduction">Introduction</A><BR>
+<A HREF="#Overview">Overview</A><BR>
+<A HREF="#Calculating aerodynamic parameters">Calculating aerodynamic parameters</A><BR>
+<A HREF="#Creating or editing a rocket configuration">Creating or editing a rocket configuration</A><BR>
+<A HREF="#Displaying results">Displaying results</A><BR>
+<A HREF="#Rocket Drawing">Rocket Drawing</A><BR>
+<A HREF="#Working with parts">Working with parts</A><BR>
+<A HREF="#File Types">File Types</A><BR>
+<A HREF="#Litterature"</A>Litterature</A><BR>
+<A HREF="#Disclaimer & Copyright">Disclaimer & Copyright</A><BR>
+<A HREF="#Acknowldements">Acknowledgements</A><BR>
+<A HREF="#Revision list">Revision list</A><BR>
+
+<!-- Contents -->
+<P>
+<B>
+<A NAME="Introduction"</A>Introduction</B><BR>
+<BR>
+Aerolab is a aerodynamic simulation program, specially intended for estimating drag, lift and stability of rockets at zero angle of attack in the velocity range from 0 to 8 Mach. Aerolab is based on published data from windtunnel experiments and numerical models including emperical and semiemperical methods. See the list of <A HREF="#Litterature"</A>litterature</A> for more information.<BR>
+<BR>
+<!-- Introduction -->
+<!-- Background -->
+Aerolab makes it possible for the user to enter rocket dimensions and mass properties. The program then also calculates the center of gravity and inertial moments around pitch/yaw axis and roll axis, assuming rotational symmetry for the mass distribution.
+
+<P>
+<B><A NAME="Calculating aerodynamic parameters"</A>Calculating aerodynamic parameters</B><BR>
+<A HREF="#Creating or editing a rocket configuration">Load</A> or <A HREF="#Creating or editing a rocket configuration">create</A> a rocket configuration.<BR>
+<BR><!-- Calculating aerodynamic parameters -->
+Select Options|Calculate in the main window to calculate its aerodynamic properties. Results are automatically displayed in the <A HREF="#Displaying results">Plot</A> window.<BR>
+
+<BR>The default velocity range is 0-3 Mach, however different settings in the range from 0 to 8 Mach may be chosen from the Setup (see <A HREF="#Creating or editing a rocket configuration">Creating or editing a rocket configuration</A>).
+
+<P>
+<B><A NAME="Overview"</A>Overview</B><BR>
+<BR>
+The main window looks like this:<BR>
+<IMG SRC="Aerolab_main.png" ALT=""><BR>
+It features the following:<BR>
+<LI><A HREF="#Main Menu"</A>Main menu</A></LI><BR>
+<LI><A HREF="#Taskbar"</A>Taskbar</A></LI><BR>
+<LI><A HREF="#Drawing Field"</A>Drawing Field</A></LI><BR>
+<LI><A HREF="#Parts Status"</A>Parts Status</A></LI><BR>
+<!-- Overview -->
+<P>
+<B><A NAME="Main Menu"</A>Main Menu</B><BR>
+<BR>
+The main menu has 4 sub menu's:<BR>
+<IMG SRC="MainMenu.png" ALT=""><BR>
+The <A HREF="#File Menu"</A>File Menu</A> facilitates operations on files.<BR>
+The <A HREF="#Options Menu"</A>Options Menu</A> is the access to changing what the software does.<BR>
+The <A HREF="#Parts Menu"</A>Parts Menu</A> menu handles operations on mechanical parts.<BR>
+The <A HREF="#Help Menu"</A>Help Menu</A> menu gives access to the help features of the software.<BR>
+
+<P>
+<B><A NAME="Taskbar"</A>Taskbar</B><BR>
+<BR>
+The taskbar contains shortcuts to the most used topics from the <A HREF="#Main Menu"</A>Main menu</A><BR>
+<IMG SRC="Taskbar.png" ALT=""><BR>
+<LI>The "New" button is a shortcut for <A HREF="#FileNew">File|New</A></LI><BR>
+<LI>The "Open" button is a shortcut for <A HREF="#FileOpen">File|Open</A></LI><BR>
+<LI>The "Save" button is a shortcut for <A HREF="#FileSave">File|Save</A></LI><BR>
+<LI>The "Compose" button is a shortcut for <A HREF="#ComposeConfiguration">Options|Compose Configuration</A></LI><BR>
+
+
+<LI>The "Draw" button is a shortcut for <A HREF="#OptionsDraw">Options|Draw</A></LI><BR>
+<LI>The "Calculate" button is a shortcut for <A HREF="#OptionsCalculate">Options|Calculate</A></LI><BR>
+<LI>The "Plot" button is a shortcut for <A HREF="#OptionsPlot">Options|Plot</A></LI><BR>
+<LI>The "Help" button is a shortcut for <A HREF="#HelpHowto">Help|How to use Aerolab</A></LI><BR>
+<LI>The "Exit" button is a shortcut for <A HREF="#FileExit">File|Exit</A></LI><BR>
+<LI>The <IMG SRC="DARKButton.png" ALT=""> button is a shortcut for <A HREF="#HelpAbout">Help|About</A></LI><BR>
+
+<P>
+<B><A NAME="Drawing Field"</A>Drawing Field</B><BR>
+<BR>
+The Drawing field shows a drawing of the rocket design currently loaded in memory<BR>
+<IMG SRC="Drawing_Field.png" ALT="">
+
+<P>
+<B><A NAME="Parts Status"</A>Parts Status</B><BR>
+<BR>
+The Parts Status displays the number of mechanical parts defined for the current design<BR>
+<IMG SRC="Part_Status.png" ALT="">
+
+<P>
+<B><A NAME="File Menu"</A>File Menu</B><BR>
+<BR><IMG SRC="FileMenu.png" ALT=""><BR>
+<A NAME="FileNew"</A>File|New clears the configuration from memory so that a new configuration may be created entirely from scratch. The list of mechanical parts is also cleared.<BR>
+<BR>
+<!-- Clear configuration -->
+<A NAME="FileOpen"</A>File|Open launches a dialog for loading a configuration from file to memory. When the file is loaded, the <A HREF="#Drawing Field"</A>Drawing Field</A> and <A HREF="#Parts Status"</A>Parts Status</A> updates with the new configuration. The configuration files are by default assumed to reside in the Aerolab\Projects folder.<BR>
+<BR>
+<A NAME="FileSave"</A>File|Save launches a dialog for writing the current configuration to a file. The configuration files are by default assumed to reside in the Aerolab\Projects folder.<BR>
+<BR>
+<A NAME="FileExit"</A>File|Exit quits the program. There is no automatic saving of the current configuration.<BR>
+
+<P>
+<B><A NAME="Options Menu"</A>Options Menu</B><BR>
+<BR><IMG SRC="OptionsMenu.png" ALT=""><BR>
+<A NAME="ComposeConfiguration"</A>Options|Compose Configuration launches the <A HREF="#Creating or editing a rocket configuration">setup</A> dialog where the geometry and the conditions of the configuration can be edited.<BR>
+<BR>
+<A NAME="OptionsCalculate"</A>Options|Calculate performs a calculation of the aerodynamical parameters of the current configuration and launches the <A HREF="#PlotWindow">plot window</A> to display the results.<BR>
+<BR>
+Options|Select Output launches the  <A HREF="#Displaying results">Plot Setup</A> dialog where the default traces of the plotting of results may be switched on and off and where the selection is made between displaying the different results of the calculation.<BR>
+<BR>
+<A NAME="OptionsPlot"</A>Options|Plot launches the <A HREF="#PlotWindow">plot window</A> to display the results of a calculation.<BR>
+<BR>
+Options|Scale launches the <A HREF="#Changing the scale of a rocket configuration">Scale Configuration dialog</A>, allowing to scale the dimensions of the entire configuration. Note that this will not affect the dimensions of any mechanical parts.<BR>
+
+<BR>
+<A NAME="OptionsDraw"</A>Options|Draw launches the <A HREF="#Rocket Drawing">Rocket Drawing</A> where the current configuration is drawn  with (optional) dimensions.<BR>
+<BR>
+Options|Export .DRG File launches a dialog for saving the drag coefficient values of the current configuration in a format that is accepted by the "Launch" trajectory simulator software.<BR>
+<BR>
+Options|Report launches a dialog for saving a HTML formatted report for the current configuration. The reports are by default assumed to reside in the Aerolab\Reports folder.<BR>
+<BR><!-- HTML report -->
+
+<P>
+<B><A NAME="Parts Menu"</A>Parts Menu</B><BR>
+<BR><IMG SRC="PartsMenu.png" ALT=""><BR>
+Parts|Parts Manager Launches the <A HREF="#Parts Manager">Parts Manager</A> for mechanical parts.<BR>
+<BR>
+Parts|Load Parts List launches a dialog for importing an existing parts list into the current design. The imported parts list overwrites any existing parts list in the currently loaded configuration. The parts lists are by default assumed to reside in the Aerolab\Parts folder.<BR>
+<BR>
+Parts|Save Parts List launches a dialog for saving the parts list of the currently loaded configuration i a file. The parts lists are by default assumed to reside in the Aerolab\Parts folder.<BR>
+<BR>
+Parts|Show Parts List displays the <A HREF="#Parts List">Parts List</A> window containing the parts list of the currently loaded configuration and the sum total of masses and inertial moments.<BR>
+<BR>
+
+<P>
+<B><A NAME="Help Menu"</A>Help Menu</B><BR>
+<BR><IMG SRC="HelpMenu.png" ALT=""><BR>
+<A NAME="HelpAbout"</A>Help|About displays the About dialog with version and web site information.<BR>
+<BR>
+<A NAME="HelpHowto"</A>Help|How to use Aerolab launches the aerolab help in the default HTML browser.<BR>
+<BR>
+
+<P>
+<B><A NAME="Creating or editing a rocket configuration"</A>Creating or editing a rocket configuration</B><BR>
+<BR><!-- Creating or editing a rocket configuration -->
+Select File|New or File|Open in the main window to create a rocket configuration. A rocket configuration can be edited in two ways, either by <A HREF="#Changing the scale of a rocket configuration"</A>scaling</A> or by editing the dimensions.<BR>
+<BR>
+Select Options|Compose Configuration in the main window to launch the setup dialog for editing the rocket dimensions. The dialog has 5 tabs containing the parameters defining Nosecone - Body - Fins -Launch Lugs - Conditions. The rocket dimensions for each part are entered at their corresponding tab. The units of measure can be either mm, cm, m or in. All 'positions' refers to the nosecone apex.<BR>
+<BR>
+<A NAME="Nosecone"</A>
+Nosecone dimensions:<BR>
+<IMG SRC="NoseConeSetup.png" ALT=""><BR>
+Enter the length and base diameter of the nosecone.<BR>
+Select the shape of the nosecone - it can be:<BR>
+<LI>Cone</LI><BR><!-- Conical nose -->
+<LI>Tangent Ogive</LI><BR><!-- Tangent ogive nose -->
+<LI>Parabolic</LI><BR><!-- Parabolic nose -->
+<LI>Ellipsoid</LI><BR><!-- Ellipsoid nose -->
+<LI>1/2 Power</LI><BR><!-- Half power nose -->
+<LI>3/4 Power</LI><BR><!-- Hypersonic optimum (3/4 power) nose  -->
+<BR>A picture shows the shape of the selected nose cone type.<BR>
+
+<A NAME="Body"</A>
+<BR>Body dimensions:<BR>
+<IMG SRC="BodySetup.png" ALT=""><BR>
+Enter the total length af the rotational symmetrical rocket body including nosecone and conical transitions.<BR>
+<BR>
+Enter the rocket nozzle exit diameter.<BR>
+<BR><!-- Nozzle -->
+Select the most suitable surface roughness with the slider.<BR>
+<BR><!-- Surface roughness -->
+Enter the number of conical transitions in the rocket. This number can be up to 10, however for a sound rocket configuration, this should be limited to 1 or 2 at maximum<BR>
+<BR>
+For Each conical transition:<BR>
+Toggle the 'Show transition No spinbutton to the apropriate number.<BR>
+Enter the length of the conical transition.<BR>
+Enter the diameter of the forward end of the transition.<BR>
+Enter the diameter of the aft end of the transition.<BR>
+Enter the distance from the nosecone apex to the forward end of the transition.<BR>
+<BR><!-- Conical transition -->
+
+<A NAME="Fin"</A>
+Fin dimensions:<BR>
+<IMG SRC="FinSetup.png" ALT="">
+<BR>
+The number of fin sections is limited 2, labeled 'forward' and 'aft'. If there is only one fin section, it is automatically labeled 'forward'. If a configuration is designed with the forward fin section positioned aft of the aft fin section, Aerolab will automatically switch the designation of the fin sections.<BR>
+<BR>
+For each fin section:<BR>
+Select the fin section - forward or aft<BR>
+Choose the number of fins i the fin section 0 - 3 - 4 or 6. Choosing zero deletes the fin section.<BR>
+Enter the distance from the nosecone apex to the forward point of the fins root chord as the fin position.<BR><!-- Fin section -->
+The body diameter at the fin section is automatically calculated.<BR>
+<BR>
+Select the profile type of the fins, either biconvex or a general hexagonal shape.<BR>
+Enter the dimensions of the fin as illustrated on the picture.<BR>
+<BR><!-- Biconvex --><!-- Hexagonal -->
+
+<A NAME="Launch Lug"</A>
+Launch Lug dimensions:<BR>
+<IMG SRC="LaunchLugSetup.png" ALT="">
+<BR>
+Aerolab handles only T shaped launch lugs. Lugs of other shapes should be transformed into a T shape with the same surface area.<BR>
+<BR>
+Enter the Height of the &quot;T&quot;, the width of the &quot;T&quot;, the material thickness and the length of the launch lug as illustrated. More lugs are allowed by setting the number of lugs.<BR>
+<BR><!-- Launch lug -->
+
+<A NAME="Conditions"</A>
+Conditions:<BR>
+<IMG SRC="ConditionSetup.png" ALT="">
+<BR>
+Enter the lower limit Mach number for the calculation (0 is default).<BR>
+<BR>
+Enter the upper limit mach number for the calculation (3.0 is default).<BR>
+<BR><!-- Limit Mach numbers -->
+Enter an optional name of the rocket project.<BR>
+<BR><!-- Project name -->
+Select the main length unit for the rocket dimensions, either mm, cm, m or in.<BR>
+<BR><!-- Length unit -->
+Select the lift curve slope unit, either pr. degree or pr. radian.<BR>
+<BR><!-- Lift curve slope unit -->
+Select the reference area, either nosecone base area, surface area for forward or aft finns or a fixed user defined area.<BR><!-- Reference area -->
+<BR>
+Set the atmospheric conditions in the range of 0-20km with the altitude slider.<BR>
+<BR><!-- Atmospheric conditions -->
+<P>
+Press the OK button to accept the configuration. The setup dialog closes, and the new configuration is shown in the main window.<BR>
+
+<P>
+<B><A NAME="Changing the scale of a rocket configuration"</A>Changing the scale of a rocket configuration</B><BR>
+<BR><!-- Scaling --><!-- Changing the scale of a rocket -->
+It is possible to scale the complete rocket configuration for - for instance - make it easier to compare different configurations at similar Reynolds Numbers.<BR>
+<BR><IMG SRC="scaleconfiguration.png" ALT=""><BR>
+
+<BR>Select Options|Scale from the main window. The Scale Configuration dialog now appears. The dialog shows the current minimum and maximum values for the current configuration for the selected Mach number range.<BR>
+
+<BR>Select the scaling factor and press the <I>OK</I> button to close the dialog.
+
+<P>
+<B><A NAME="Displaying results"</A>Displaying results</B><BR>
+<BR><!-- Plotting --><!-- Displaying results -->
+The results of a <A HREF="#Calculating aerodynamic parameters">calculation</A> is available in graphical form. Select Options|Select Output to display the Plot Setup dialog.<BR>
+<IMG SRC="PlotSetup.png" ALT=""><BR>
+This dialog gives the option to choose between the 
+<LI>Drag data (drag coefficient)</LI>
+<LI>Lift data (lift curve slope coefficient)</LI>
+<LI>Center of pressure data</LI>
+<LI>Vehicle properties (e.g. stability margin if there are any mechanical parts defined)</LI>
+<BR>
+For each result type, a list of specific results are displayed. Check the appropriate topics from the result list. When finished, press OK to close the dialog.<BR>
+<BR>
+<P>
+<B><A NAME="PlotWindow"</A>Plot Window</B><BR>
+<BR>
+Select Options|Calculate from the main window to calculate the aerodynamic parameters of the current configuration and automatically display the Plot Window - or simply Options|Plot  if calculation has already been done. The plot window appears with a graphical representation of the results, according to the selections in the <A HREF="#Displaying results">Plot Settings</A> dialog.<BR>
+<BR>
+The plot shows a graph with the selected outputs as individually colored traces.<BR>
+<IMG SRC="PlotWindow.png" ALT=""><BR>
+The features of the Plot Window may be accessed through its menu or its taskbar. There are 3 menu points:<BR>
+<LI>File</LI><BR>
+<LI>Data</LI><BR>
+<LI>Options</LI><BR>
+<BR>
+<IMG SRC="PlotFileMenu.png" ALT=""><BR>
+The File menu handles closing th window and exporting the data. When File|Export Data is chosen, a dialog opens for saving the data displayed as traces on the graph. Changing the kinds and number of traces on the graph also changes the exported data. Data is exported in a simple ASCII format, adequate for importing in a spreadsheet or a text editor. The default location for exported data is the Aerolab\Export folder.<BR>
+<BR>
+<IMG SRC="PlotDataMenu.png" ALT=""><BR>
+The Data|Select Plot launches the <A HREF="#Displaying results">Plot Setup</A> dialog for reselecting the traces to display on the plot.<BR>
+<BR>
+<IMG SRC="PlotOptionsMenu.png" ALT=""><BR>
+The plot may be copied to clipboard by selecting Options|Copy to Clipboard.<BR>
+<BR>
+Printing the plot is initiated by selecting Options|Copy to Printer.<BR>
+<BR>
+A comment may be added to the plot by selecting Options|Add Comments. This will open a edit field in the taskbar:<BR>
+<IMG SRC="comment.png" ALT=""><BR>
+Edit the comment and press [ENTER], and the comment is added to the plot:<BR>
+<IMG SRC="CommentPlot.png" ALT=""><BR>
+<BR><!-- Comment -->
+The taskbar of the Plot Window provides shortcuts for all of the menu points of the Plot Window - plus an additional shortcut for the About box.<BR>
+
+<P>
+<B><A NAME="Rocket Drawing"</A>Rocket Drawing</B><BR>
+<BR><!-- Drawing -->
+Select Options|Draw in the main window to display a complete drawing of the rocket configuration. The drawing has options for displaying the rockets dimensions, for showing the detils of the fins and for showing its stability characteristica.<BR>
+<BR>
+The features of the Rocket Drawing are accessible through its menu or its taskbar<BR>
+<IMG SRC="DrawingFileMenu.png" ALT=""><BR>
+File|Close closes the rocket drawing.<BR>
+<BR>
+<IMG SRC="DrawingOptionsMenu.png" ALT=""><BR>
+Use Options|Copy to Clipboard to copy the drawing bitmap to the clipboard or
+select Options|Copy to Printer to print the drawing bitmap on the default printer.<BR>
+<BR>
+Stability data is added to the drawing by selecting Options|Stability Analysis. The markers for CP and CG are placed on the drawing showing their movements throughout the flight. If there are no parts defined for the current configuration, only CP is shown, and if the aerodynamic parameters have not been calculated, the CP will be calculated by the Barrowman method.<BR>
+<BR><!-- Stability analysis -->
+Options|Fin Details shows the details of the fins, including drawings of their profiles.<BR>
+<BR>
+Options|Toggle Dimensions will turn off (or on) the mechanical dimensions of the rocket.<BR>
+<BR><!-- Toggle dimensions -->
+
+Options|Parts Visible will turn on (or off) the rendering of mechanical parts of the rocket. Parts that have one of the predefined geometrical shapes will be shown accordingly while user defined shapes will be shown only as circles indicating their center of gravity. <BR>
+<BR><!-- Parts visible -->
+
+Options|Export to DXF create a DXF formatted file of the rocket drawing. The resulting DXF file may be imported in most popular CAD software programs or other drawing softwares. The resulting DXF file is by default assumed to reside in the Aerolab/Export folder.<BR>
+<BR><!-- DXF export -->
+<IMG SRC="DrawingTaskbar.png" ALT=""><BR>
+The Rocket Drawing taskbar has shortcuts for the following menu points:<BR>
+<LI>Options|Copy to Clipboard.</LI><BR>
+<LI>Options|Copy to Printer.</LI><BR>
+<LI>Options|Stability Analysis.</LI><BR>
+<LI>Options|Fin Details.</LI><BR>
+<LI>File|Close.</LI><BR>
+<LI>The about box.</LI><BR>
+
+<P>
+<B><A NAME="Working with parts"</A>Working with parts</B><BR>
+<BR>
+Aerolab makes it possible to calculate the center of gravity and the intertial moments of the rocket configuration. The basic tool for the mechanical properties is the <A HREF="#Parts Manager">Parts Manager</A>, in which all parts of the rocket can be specified to a rather detailed level, or in a very basic level, though reducing the precision of the inertial moment calculation.<BR>
+<BR><!-- Parts -->
+The mechanical properties is kept in a Parts list. It is possible to create a Parts list via the <A HREF="#Parts Manager">Parts Manager</A>, or by loading a parts list from a file. Once the Parts list is loaded, it can be displayed, edited or saved to disk.<BR>
+<BR>
+Note that the mechanical parts in the parts list are not in any way linked to the definitions of the rocket body, thus changing the dimensions of a rocket does not change its parts list or vice versa.<BR>
+<BR>
+
+
+<P>
+<B><A NAME="Parts Manager"</A>Parts Manager</B><BR>
+<BR>
+The Parts Manager keeps track of the mechanical parts in a rocket. It is reached by selecting Parts|Parts Manager from the main window. <BR>
+<BR><IMG SRC="partsmanager.png" ALT=""><BR>
+
+From within the Parts Manager it is possible to do the following:<BR>
+<BR>
+<A NAME="Add part"</A>
+Add a new part:<BR>
+This action creates a new part. Press the <I>'Add Part'</I> button to launch the <A HREF="#Part Properties Dialog">Part Properties Dialog</A> with a new part.<BR>
+<BR><!-- Add part -->
+
+<A NAME="Edit part"</A>
+Edit part:<BR>
+This action edits an existing part. Select a part and press the <I>'Edit'</I> button to launch the <A HREF="#Part Properties Dialog">Part Properties Dialog</A> with the selected part.<BR>
+<BR><!-- Edit part -->
+
+<A NAME="Delete part"</A>
+Delete part:<BR>
+This action deletes an existing part. Select a part and press the <I>'Delete'</I> button to delete the part.<BR><!-- Delete part -->
+<BR>
+
+<A NAME="Combine parts"</A>
+Combine parts:<BR>
+This action is for merging multiple parts into one single part. Press the <I>'Combine'</I> button to launch the <A HREF="#Parts Combiner">Parts Combiner</A><BR>
+<BR><!-- Combine parts -->
+
+<A NAME="Translate parts"</A>
+Translate parts:<BR>
+This action is for moving all parts along the rocket center axis. Press the <I>'Translate All'</I> button to launch the <A HREF="#Translation Dialog">translation dialog</A>.<BR>
+<BR><!-- Translate parts -->
+
+<A NAME="Import parts"</A>
+Import parts:<BR>
+This action is for importing parts from another Parts list. Press the <I>'Import' </I>button to launch the <A HREF="#Import Parts">Parts Import dialog</A>.<BR>
+<BR><!-- Import parts -->
+
+Delete All:<BR>
+This action deletes all parts in the Parts list. Press the <I>'Delete All'</I> button to delete all parts.<BR>
+<BR>
+Close:<BR>
+This action closes the Parts Manager. Press the <I>'Close'</I> button to leave the Parts Manager.<BR>
+
+
+<P>
+<B><A NAME="Part Properties Dialog"</A>Part Properties Dialog</B><BR>
+<BR><!-- Part properties -->
+The Part Properties Dialog is the tool for editing the properties of a part -either a new part or an existing part.<BR>
+<IMG SRC="partproperties.png" ALT=""><BR>
+Select the part type from the drop-down list of several geometrical shapes or a user object. Selecting a geometrical part launches the <A HREF="#Part Dimensions Dialog">Part Dimensions Dialog</A>.<BR>
+<BR>
+For geometrical parts, Aerolab can calculate the center of gravity automatically. This feature can be enabled or disabled by checking the <I>'Automatic Center of Gravity'</I> checkbox.<BR>
+<BR>
+Aerolab calculates the mechanical properties of the rocket with and without propellant. Check the <I>'Treat as Propellant'</I> checkbox to define the part as propellant.<BR>
+<BR><!-- Propellant -->
+For propellant parts defined as either being tubular or cylindrical, a burn model may be specified. The burn model describes the way the rocket looses mass during burn. As it is assumed, that the mass decreases linearly with the Mach number, the center of gravity and inertial moments are calculated as functions of the Mach number.<BR>
+<BR>
+In some situations it can be handy to a 'reverse combination' of parts. To support this, a part with negative mass can be defined by checking the <I>'Negate Weight'</I> checkbox.<BR>
+<BR>Enter the name of the part in the Part Designation field.<BR>
+
+<BR>For User Objects, enter the weight of the part in kg.<BR>
+
+<BR>Enter the distance of the most forward point of the part to the Nosecone apex in mm.<BR>
+
+<BR>For parts with manual center of gravity, enter the distance from the most forward point of the part to the center of gravity of the part in mm.<BR>
+
+<BR>For User Objects, enter the pitch (yaw) intertial moment around the nosecone apex in kg*m2.<BR><!-- Inertial moment -->
+
+<BR>For User Objects, enter the roll inertial moment around the rocket center axis in kg*m2.<BR>
+
+<BR>Note that for parts that are not user objects, their inertial moments are calculated from the part weight under the assumption of homogenious density.<BR>
+
+<BR>Press the <I>OK button</I> to accept the part.
+
+<P>
+<B><A NAME="Part Dimensions Dialog"</A>Part Dimensions Dialog</B><BR>
+<BR><!-- Part dimensions -->
+The Part Dimensions Dialog is the tool for editing mechanical parts of certain geometrical shapes.<BR>
+<IMG SRC="partdimensions.png" ALT="">
+
+<BR>The type of part has already been selected in the <A HREF="#Part Properties Dialog">Part Properties Dialog</A><BR>
+
+<BR>Enter the dimentions of the specific part, and select the part material from the <I>'Material'</I> drop-down list. The density of the part material is the only required material property. If no suitable material is found in the list, choose <I>User Material</I> and type in the material density manually.<BR>
+<BR>
+Press the <I>OK</I> button to accept the part.
+
+
+<P>
+<B><A NAME="Parts Combiner"</A>Parts Combiner</B><BR>
+<BR>
+The Parts Combiner is a tool for combining several parts to one single part. The dialog consists of the <I>Rocket Parts List</I> holding all the parts in the Parts list, and the  <I>New Combined Part</I> list to which the parts destined for combination can be transferred.<BR>
+<IMG SRC="partscombiner.png" ALT=""><BR>
+Select a part from the <I>Rocket Parts List</I> and transfer it to the <I>New Combined Part</I> by pressing the <I>'&gt;'</I> key or press the <I>'&gt;&gt;'</I> key to transfer all parts from the <I>Rocket Parts List</I> to the <I>New Combined Part</I>.<BR>
+
+<BR>To transfer a part back to the <I>Rocket Parts List</I>, select the part from the <I>New Combined Part</I> list and press the <I>'&lt;'</I> key. To transfer all parts on the <I>New Combined Part</I> list back to the <I>Rocket Parts List</I> press the <I>'&lt;&lt;'</I> key.<BR>
+
+<BR>Once the <I>New Combined Part</I> holds all the proper parts, enter a name for the new part and press the <I>OK</I> button. The parts forming the new combined part  is then deleted from the overall parts list, and replaced by the new part, thus preserving the overall mass and inertial moment properties.<BR>
+
+<BR>NOTE: Propellant parts may not be combined!
+
+
+<P>
+<B><A NAME="Import Parts"</A>Import Parts Dialog</B><BR>
+<BR>The Import Parts dialog gives access to parts form another rocket design or from a parts list that has been stored as a separate file.<BR>
+<BR>
+<IMG SRC="importparts.png" ALT="">
+
+<BR>The Import Parts Dialog consists of two lists - a <I>Pick to import</I> list and a <I>Selected Parts</I> list. The <I>Pick to import</I> list holds the parts in the parts list to import. The <I>Selected Parts</I> list holds the list of parts to actually import into the current design.<BR>
+<BR>
+Select a part from the <I>Pick to import list</I> and press the <I>'&gt;'</I> key to transfer it to the <I>Selected Parts</I> list. To transfer all parts press the <I>'&gt;&gt;'</I> key.<BR>
+<BR>
+To remove a part from the <I>Selected Parts</I> list, select the part and press the <I>'&lt;'</I> button, or press the <I>'&lt;&lt;'</I> button to remove all parts from the <I>Selected Parts</I> list and transfer them back to the <I>Pick to import</I> list.<BR>
+
+<BR>When parts are imported from another design (or parts list), their location(s) may need to be changed. The location of the most forward part in the <I>Selected Parts</I> list is displayed. If this position is acceptable, then press the <I>OK</I> button to import the part(s) - otherwise change the location to place the part(s) correctly in the current design. Note that this operation will translate all the selected parts according to the new placement of the most forward part. Import only one part at a time if they need to be placed individually - or import all parts in one operation and <A HREF="#Part Properties Dialog">edit</A> them individually afterwards.<BR>
+
+<BR>Press the <I>OK</I> button to when ready to import the parts on the <I>Selected Parts</I> list into the current design.
+
+<P>
+<B><A NAME="Translation Dialog"</A>Translation Dialog</B><BR>
+<BR>
+The parts in the Parts list can all be translated along the rocket center axis.<BR>
+<BR><IMG SRC="translationdialog.png" ALT="">
+
+<BR>Enter the new location of the most forward part in mm.<BR>
+<BR>
+Press the <I>OK</I> button to accept.<BR>
+
+<P>
+<B><A NAME="Parts List"</A>Parts List</B><BR>
+<BR><!-- Parts list -->
+The Parts List shows an overview of the mechanical parts that are defined for the rocket. It lists the mass and inertial moments of each of the parts and the sum total for the entire rocket in its full and empty conditions.<BR>
+<IMG SRC="partslist.png" ALT=""><BR>
+
+<BR>The menu and toolbar of the Parts List supports the following:<BR>
+
+<LI>The Parts List may be copied to the Clipboard.</LI><BR>
+<LI>The Parts List may be printed on the default printer.</LI><BR>
+<LI>The Parts List window may be closed.</LI><BR>
+
+<P>
+<B><A NAME="File Types"</A>File Types</B><BR>
+<BR><!-- File types -->
+Aerolab supports the following file types:<BR>
+<TABLE WIDTH="95%" BORDER="1">
+
+<TR>
+<TD></SUP>*.ROC</TD>
+<TD></SUP>The main file format describing the rockets dimensions.</TD>
+</TR>
+
+<TR>
+<TD></SUP>*.DRG</TD>
+<TD></SUP>Write only. Export of drag coefficients for the LAUNCH trajectory calculation.</TD>
+</TR>
+
+<TR>
+<TD></SUP>*.DAT</TD>
+<TD></SUP>Write only. Export of data in ASCII format.</TD>
+</TR>
+
+<TR>
+<TD></SUP>*.PTL</TD>
+<TD></SUP>Parts list file format containing mass properties of the rocket.</TD>
+</TR>
+
+<TR>
+<TD></SUP>*.DXF</TD>
+<TD></SUP>Rocket drawing in the popular DXF format for varoius CAD programs (export only).</TD>
+</TR>
+</TABLE>
+</SUP><BR><FONT SIZE="4" COLOR="#400040">
+<BR>
+
+<P>
+<B><A NAME="Litterature"</A>Litterature</B><BR>
+<BR><!-- Litterature list -->
+Aerolab is based on the following litterature:<BR>
+<BR>
+USAF Stability and control DATCOM<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Flight Control Division<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Air Force Flight Dynamics Laboratory<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wright-Patterson Air Force Base, Ohio<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1978<BR>
+<BR>
+Boundary Layer Theory<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dr. H Schlichting<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;McGraw-Hill<BR>
+<BR>
+Mechanics of Fluids<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;W. J. Duncan, A .S Thom, A. D. Young<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edward Arnold <BR>
+<BR>
+Missile Configuration Design<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S. S. Chin<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;McGraw-Hill 1961<BR>
+<BR>
+NACA Tecnical Note 1032<BR>
+NACA Technical Note 4201<BR>
+NACA Tecnical Report 1386<BR>
+NACA Tecnical Report 1153<BR>
+NACA Tecnical Report 1353<BR>
+NACA Tecnical Report 1374<BR>
+NACA Tecnical Report 1253<BR>
+NACA Tecnical Report 1227<BR>
+NACA Tecnical Report 1238<BR>
+NACA Tecnical Report 1307<BR>
+NACA Research Memorandum RM A53A30<BR>
+<BR>
+Nasa Nike Tomahawk Handbook<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Thiokol Chemical Corporation<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Astro-Met Division<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P.O.Box 1497 Ogden, Utah<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1966<BR>
+<BR>
+Stabilisering af raketter ved Hj&aelig;lp af Barrowmans metode<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;J. Franck<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dansk Amat&oslash;r Raket Klub<BR>
+<BR>
+Theory of Wing Sections<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ira h. Abbot, A. E. Von Doenhoff<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dover Publications, Inc 1958<BR>
+<BR>
+MIL-HDBK-762(MI): DESIGN OF AERODYNAMICALLY STABILIZED
+FREE ROCKETS<BR>
+<BR>
+All values of the atmospheric parameters are from the US STANDARD ATMOSPHERE <BR>
+SUPPLEMENTS, 1966 (60deg N, July)<BR>
+
+<P>
+<B><A NAME="Revision list"</A>Revision List</B><BR>
+Version 1.0:<BR><!-- Revisions -->
+This is the basic version of Aerolab. <BR>
+<BR>
+Version 1.1:<BR>
+Intermediate version (not public).<BR>
+<BR>
+Version 1.2:<BR>
+This is basically a bug fixed with only a few new features. The major bugsfixes are:<BR>
+- Annoying fin dimension problems fixed in setup form.<BR>
+- CP calculation error in pr. degree mode.<BR>
+- A rendering error when handling conical transitions.<BR>
+The drawing form has been updated with the possibility of exporting to DXF and to switch off the measurements. Also the positions of CP and CG are now marked in a more intuitive way.<BR>
+<BR>
+Version 1.2.1:<BR>
+- Fixed CP calculation error in pr. degree mode (tough one!).<BR>
+<BR>
+Version 1.3.0:<BR>
+- Fin pressure drag model updated with some obvious errors removed..<BR>
+- Fixing of various bugs.<BR>
+- Updated models for nosecone with body.<BR>
+- Rocket drawing can now show mechanical parts.<BR>
+- HTML format report generator.<BR>
+- Help entirely rewritten, and now in HTML.<BR>
+- Graphical brush up.<BR>
+<BR>
+Version 1.3.1:<BR>
+- Fixed "current fin" definition problem in partmanager.<BR>
+<BR>
+Version 1.3.2:<BR>
+- Fixed subsonic CP problem with flared rockets.<BR>
+<P>
+<B><A NAME="Acknowldements"</A>Acknowldements</B><BR>
+<BR><!-- Acknowldements --><BR>
+PNG image support by Jack Goman - jack@SharePower.VirtualAve.net<BR>
+<P>
+<B><A NAME="Disclaimer & Copyright"</A>Disclaimer & Copyright</B><BR>
+<BR><!-- Disclaimer -->
+This program is Copyright (C) 1998 - 2003 by Hans Olaf Toft (hot@vip.cybercity.dk),<BR>
+All Rights Reserved.<BR>
+<BR>
+Aerolab is provided as freeware with the following limitations:<BR>
+<BR>
+Aerolab is freeware for any user that considers himself - or herself - as being a friend of the Danish Amateur Rocketry Club - DARK. It is not to be resold or distributed for sale with other programs which are for sale. The author offers no warranty of its fitness for any purpose whatsoever, and accepts no liability whatsoever for any loss or damage incurred by its use. Furthermore, Aerolab may not be used for commercial purposes - it is a tool for the amateur rocketry community only.<BR>
+<BR>
+Aerolab is not a supported product. The author accepts no commitment or liability to address any problems that may be encountered in using it. However, further development and improvements are planned, and as such, the author is always interested to hear about any (major) bugs or deficiencies.<BR>
+
+<P>
+<B><A NAME="Keywords"</A>Keywords</B><BR>
+<BR><!-- Keywords -->
+
+<A HREF="#Acknowldements">Acknowldements</A><BR>
+<A HREF="#Add part">Add part</A><BR>
+<A HREF="#Conditions">Atmospheric conditions</A><BR>
+<A HREF="#Introduction">Background</A><BR>
+<A HREF="#Fin">Biconvex</A><BR>
+<A HREF="#Calculating aerodynamic parameters">Calculating aerodynamic parameters</A><BR>
+<A HREF="#Changing the scale of a rocket configuration">Changing the scale of a rocket</A><BR>
+<A HREF="#FileNew">Clear configuration</A><BR>
+<A HREF="#Combine parts">Combine parts</A><BR>
+<A HREF="#PlotWindow">Comment</A><BR>
+<A HREF="#Nosecone">Conical nose</A><BR>
+<A HREF="#Body">Conical transition</A><BR>
+<A HREF="#Contents">Contents</A><BR>
+<A HREF="#Creating or editing a rocket configuration">Creating or editing a rocket configuration</A><BR>
+<A HREF="#Delete part">Delete part</A><BR>
+<A HREF="#Disclaimer & Copyright">Disclaimer</A><BR>
+<A HREF="#Displaying results">Displaying results</A><BR>
+<A HREF="#Rocket Drawing">Drawing</A><BR>
+<A HREF="#Rocket Drawing">DXF export</A><BR>
+<A HREF="#Edit part">Edit part</A><BR>
+<A HREF="#Nosecone">Ellipsoid nose</A><BR>
+<A HREF="#File Types">File types</A><BR>
+<A HREF="#Fin">Fin section</A><BR>
+<A HREF="#Nosecone">Half power nose</A><BR>
+<A HREF="#Fin">Hexagonal</A><BR>
+<A HREF="#OptionsDraw">HTML report</A><BR>
+<A HREF="#Nosecone">Hypersonic optimum (3/4 power) nose </A><BR>
+<A HREF="#Import parts">Import parts</A><BR>
+<A HREF="#Part Properties Dialog">Inertial moment</A><BR>
+<A HREF="#Introduction">Introduction</A><BR>
+<A HREF="#Keywords">Keywords</A><BR>
+<A HREF="#Launch Lug">Launch lug</A><BR>
+<A HREF="#Conditions">Length unit</A><BR>
+<A HREF="#Conditions">Lift curve slope unit</A><BR>
+<A HREF="#Conditions">Limit Mach numbers</A><BR>
+<A HREF="#Litterature">Litterature list</A><BR>
+<A HREF="#Body">Nozzle</A><BR>
+<A HREF="#Overview">Overview</A><BR>
+<A HREF="#Nosecone">Parabolic nose</A><BR>
+<A HREF="#Part Dimensions Dialog">Part dimensions</A><BR>
+<A HREF="#Part Properties Dialog">Part properties</A><BR>
+<A HREF="#Parts List">Parts list</A><BR>
+<A HREF="#Working with parts">Parts</A><BR>
+<A HREF="#Rocket Drawing">Parts visible</A><BR>
+<A HREF="#Displaying results">Plotting</A><BR>
+<A HREF="#Conditions">Project name</A><BR>
+<A HREF="#Part Properties Dialog">Propellant</A><BR>
+<A HREF="#Conditions">Reference area</A><BR>
+<A HREF="#Revision list">Revisions</A><BR>
+<A HREF="#Changing the scale of a rocket configuration">Scaling</A><BR>
+<A HREF="#Rocket Drawing">Stability analysis</A><BR>
+<A HREF="#Body">Surface roughness</A><BR>
+<A HREF="#Nosecone">Tangent ogive nose</A><BR>
+<A HREF="#Rocket Drawing">Toggle dimensions</A><BR>
+<A HREF="#Translate parts">Translate parts</A><BR>
+
+
+</FONT>
+  </body>
+</HTML>
+

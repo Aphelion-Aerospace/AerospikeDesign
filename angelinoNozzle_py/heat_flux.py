@@ -58,8 +58,9 @@ def heat_flux(Pr,Cp,Gamma,c,w,To,T_w,spike):
     #spike.s,spike.y,spike.M,spike.V,spike.rho,spike.T)
     #set the first 0.4mm h3 to be the same as the h3 at location 0.4mm, because h3 approached inf at leading edge
     i=1
-    while i < 277:
-        heat.h3_m[i]=heat.h3_m[277]
+    idx_min = np.int(277/10000*len(spike.x))
+    while i < idx_min:
+        heat.h3_m[i]=heat.h3_m[idx_min]
         i=i+1
     #compute heat flux assuming cylinder with height dx
     q=np.zeros(len(spike.x))

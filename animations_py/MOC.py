@@ -24,11 +24,13 @@ class chr_point():
 
     def plot_point(self):
         plt.plot(self.x,self.y,'bx')
+        plt.plot(self.x,self.y*-1,'bx')
+
         # will calculate other properties later (p etc.) to vectorize
 class chr_mesh():
-    def __init__(self,spike,gamma,altitude,n,downstream_factor=1.1,plot_chr=0,clean_mesh=1):
+    def __init__(self,spike,gamma,altitude,n,num_its,downstream_factor=1.1,plot_chr=0,clean_mesh=1):
 
-        self.spike =copy.copy(spike); self.gamma = gamma; self.altitude =altitude; self.n = n
+        self.spike =copy.copy(spike); self.gamma = gamma; self.altitude =altitude; self.n = n; self.num_its = num_its
 
         self.downstream_factor = downstream_factor # percentage down after mesh cross with centre to continue meshing
         # constants of iteration
@@ -83,17 +85,19 @@ class chr_mesh():
 
 
 
-
+        its = 0
         self.contour_fan = 1
         self.new_fan = 1
         self.first_base_intercept = 1
         self.centre_line_intercept = 0
         self.END_SIM = 0
         #while (self.chr_array[self.ID_contour_chr[-1]].x <= spike.x.max()):
-        while self.chr_point_less_zero() and self.contour_converge():
+        while self.chr_point_less_zero() and self.contour_converge() and its < num_its:
         ## TODO: COMPUTE EXPANSION FAN UNTIL POINT IS > spike.length in which case, remove from all tracking lists and do not add to chr_array
             ## CONTOUR FAN
             # if (self.contour_fan):
+            # print(its)
+            its += 1
             ID_temp = self.ID_right_chr.pop(0)
             #print(ID_temp)
             if(self.new_fan):
@@ -162,8 +166,9 @@ class chr_mesh():
                         #print(temp1.x)
                         if (self.plot_chr):
                             plt.plot(self.chr_array[self.ID_right_chr[0]].x,self.chr_array[self.ID_right_chr[0]].y,'bx',self.chr_array[ID_temp].x,self.chr_array[ID_temp].y,'rx')
+                            plt.plot(self.chr_array[self.ID_right_chr[0]].x,self.chr_array[self.ID_right_chr[0]].y*-1,'bx',self.chr_array[ID_temp].x,self.chr_array[ID_temp].y*-1,'rx')
                             plt.plot(temp1.x,temp1.y,'go')
-
+                            plt.plot(temp1.x,temp1.y*-1,'go')
                             #plt.plot([self.chr_array[ID_temp].x, temp1.x],[self.chr_array[ID_temp].y, temp1.y])
                         self.chr_array = np.append(self.chr_array,temp1)
                   
@@ -175,7 +180,9 @@ class chr_mesh():
                         if (new_point.x<=self.spike.length):
                             pass
                         if (self.plot_chr):
+                            plt.plot([self.chr_array[ID_temp].x, temp2.x],[self.chr_array[ID_temp].y*-1, temp2.y*-1],'k',[self.chr_array[self.ID-1].x, temp2.x],[self.chr_array[self.ID-1].y*-1, temp2.y*-1],'k')  
                             plt.plot([self.chr_array[ID_temp].x, temp2.x],[self.chr_array[ID_temp].y, temp2.y],'k',[self.chr_array[self.ID-1].x, temp2.x],[self.chr_array[self.ID-1].y, temp2.y],'k')                    
+
                     self.ID += 1
                     self.chr_array = np.append(self.chr_array,new_point)
                 
@@ -281,6 +288,7 @@ class chr_mesh():
             # self.ID_right_chr.append(self.ID)              
         if (plot_chr):
             plt.plot([A.x,x_c],[A.y,y_c],'k',[B.x,x_c],[B.y,y_c],'k')
+            plt.plot([A.x,x_c],[A.y*-1,y_c*-1],'k',[B.x,x_c],[B.y*-1,y_c*-1],'k')
       
         return chr_point(self.gamma,x_c,y_c,theta_c,W_c,'general')
 
@@ -300,6 +308,8 @@ class chr_mesh():
             pass
         if (plot_chr):
             plt.plot([A.x,x_c],[A.y,y_c],'k',[B.x,x_c],[B.y,y_c],'k')
+            plt.plot([A.x,x_c],[A.y*-1,y_c*-1],'k',[B.x,x_c],[B.y*-1,y_c*-1],'k')
+
         return chr_point(self.gamma,x_c,y_c,theta_c,W_c,'same_fam')
 
     def contour_point(self,A,plot_chr=0):
@@ -319,6 +329,7 @@ class chr_mesh():
             pass  
         if(plot_chr):
             plt.plot([A.x,x_c],[A.y,y_c],'k')
+            plt.plot([A.x,x_c],[A.y*-1,y_c*-1],'k')
 
         return chr_point(self.gamma,x_c,y_c,theta_c,W_c,'contour')
 
@@ -339,6 +350,8 @@ class chr_mesh():
             # self.ID_jet_boundary.append(self.ID)
         if (plot_chr):
             plt.plot([A.x,x_c],[A.y,y_c],'r',[B.x,x_c],[B.y,y_c],'r')
+            plt.plot([A.x,x_c],[A.y*-1,y_c*-1],'r',[B.x,x_c],[B.y*-1,y_c*-1],'r')
+
         return chr_point(self.gamma,x_c,y_c,theta_c,W_c,'jet')
     def internal_jet_point(self,A,B,plot_chr=0):
         # given points A and B (where A is previous internal jet boundary point)
@@ -370,6 +383,8 @@ class chr_mesh():
             pass
         if (plot_chr):
             plt.plot([A.x,x_c],[A.y,y_c],'g',[B.x,x_c],[B.y,y_c],'g')
+            plt.plot([A.x,x_c],[A.y*-1,y_c*-1],'g',[B.x,x_c],[B.y*-1,y_c*-1],'g')
+
         return chr_point(self.gamma,x_c,y_c,theta_c,W_c,'contour')                
 
     def add_break_ID(self):

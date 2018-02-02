@@ -1,4 +1,6 @@
 import numpy as np 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import scipy.optimize
 import multiprocessing as mp
@@ -184,6 +186,37 @@ class aerospike_optimizer():
 		print('work = ' + str(work))
 		return -alpha*work + beta*total_heat_flux
 
+
+	def multicore_animate_to_its(max_its,no_core):
+		iterations = np.arange(max_its)
+
+		iterations_split = np.split(iterations,no_core)
+		for i in range(no_core):
+			proc = mp.Process(target=self.animate_to_its, args = args)
+			proc_list.append(proc)
+			pipe_list.append(recv_end)
+			proc.start()
+
+
+		return thrust_range
+
+
+	def animate_to_its(self,num_its):
+		spike = self.__design_angelino_nozzle(self.design_alt_init,self.truncate_ratio_init,self.CEA,self.r_e)
+
+
+		for its in num_its:
+			spike.plot_contour(plt)
+			spike.y = spike.y*-1; spike.lip_y = spike.lip_y*-1
+			spike.plot_contour(plt)
+			MOC_mesh = MOC.chr_mesh(spike,self.CEA.gamma,self.design_alt_init,30,its,downstream_factor=1.1,plot_chr=1)
+		
+			plt.ylim((-0.1,0.1))
+			plt.xlim((-0.01,0.26))
+			name = 'animation_1_full_length/fig' + str(its)
+			plt.savefig(name)
+			plt.close()
+
 	def cost_opt_contour_params(self,params): 
 		"""params = np.concatenate((spike_opt.x,spike_opt.y))
 		"""
@@ -216,12 +249,13 @@ if __name__ == '__main__':
 	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=30,no_alt_range = 16,no_core=4)
 
 
-	contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))
+	# contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))
 
-	print(optimizer.cost_opt_contour_params(contours))
+	# print(optimizer.cost_opt_contour_params(contours))
 
 	#print(optimizer.cost_opt_design_params([design_alt,truncate_ratio]))
 	#plt.legend()
+	optimizer.animate_to_its([30,50,812])
 	plt.show()
 # def cost_opt_design_params(params) : return cost_func_design_params(params,T_w,CEA,r_e,alpha,beta,chr_mesh_n=30,no_core=4)
 

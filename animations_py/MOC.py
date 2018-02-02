@@ -28,9 +28,9 @@ class chr_point():
 
         # will calculate other properties later (p etc.) to vectorize
 class chr_mesh():
-    def __init__(self,spike,gamma,altitude,n,num_its,downstream_factor=1.1,plot_chr=0,clean_mesh=1):
+    def __init__(self,spike,gamma,altitude,n,downstream_factor=1.1,plot_chr=0,clean_mesh=1):
 
-        self.spike =copy.copy(spike); self.gamma = gamma; self.altitude =altitude; self.n = n; self.num_its = num_its
+        self.spike =copy.copy(spike); self.gamma = gamma; self.altitude =altitude; self.n = n;
 
         self.downstream_factor = downstream_factor # percentage down after mesh cross with centre to continue meshing
         # constants of iteration
@@ -92,7 +92,7 @@ class chr_mesh():
         self.centre_line_intercept = 0
         self.END_SIM = 0
         #while (self.chr_array[self.ID_contour_chr[-1]].x <= spike.x.max()):
-        while self.chr_point_less_zero() and self.contour_converge() and its < num_its:
+        while self.chr_point_less_zero() and self.contour_converge():
         ## TODO: COMPUTE EXPANSION FAN UNTIL POINT IS > spike.length in which case, remove from all tracking lists and do not add to chr_array
             ## CONTOUR FAN
             # if (self.contour_fan):

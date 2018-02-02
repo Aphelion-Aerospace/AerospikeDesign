@@ -11,6 +11,7 @@ import gasdynamics as gd
 from heat_flux import heat_flux
 from plug_nozzle_angelino import plug_nozzle 
 import MOC
+import MOC_its
 
 
 ## NASA CEA CONSTANTS
@@ -187,18 +188,15 @@ class aerospike_optimizer():
 		return -alpha*work + beta*total_heat_flux
 
 
-	def multicore_animate_to_its(max_its,no_core):
+	def multicore_animate_to_its(self,max_its,no_core):
 		iterations = np.arange(max_its)
-
+		np.random.shuffle(iterations)
 		iterations_split = np.split(iterations,no_core)
 		for i in range(no_core):
+			args = (iterations_split[i],)
 			proc = mp.Process(target=self.animate_to_its, args = args)
-			proc_list.append(proc)
-			pipe_list.append(recv_end)
 			proc.start()
 
-
-		return thrust_range
 
 
 	def animate_to_its(self,num_its):
@@ -209,13 +207,56 @@ class aerospike_optimizer():
 			spike.plot_contour(plt)
 			spike.y = spike.y*-1; spike.lip_y = spike.lip_y*-1
 			spike.plot_contour(plt)
-			MOC_mesh = MOC.chr_mesh(spike,self.CEA.gamma,self.design_alt_init,30,its,downstream_factor=1.1,plot_chr=1)
+
+			try:
+				MOC_mesh = MOC_its.chr_mesh(spike,self.CEA.gamma,self.design_alt_init,30,its,downstream_factor=1.1,plot_chr=1)
 		
+			except:
+				pass
+
 			plt.ylim((-0.1,0.1))
 			plt.xlim((-0.01,0.26))
 			name = 'animation_1_full_length/fig' + str(its)
 			plt.savefig(name)
 			plt.close()
+
+	def animate_over_range(self,plug_nozzle_class,alt_range,downstream_factor=1.2,chr_mesh_n=50):
+		
+		for i in range(alt_range.shape[0]):
+			# print(alt_range[i])
+			plug_nozzle_class.plot_contour(plt)
+			plug_nozzle_class.y = plug_nozzle_class.y*-1; plug_nozzle_class.lip_y = plug_nozzle_class.lip_y*-1
+			plug_nozzle_class.plot_contour(plt)
+			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,CEA.gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor,plot_chr=1)
+
+			plt.ylim((-0.1,0.1))
+			plt.xlim((-0.01,0.26))
+			name = 'animation_2_full_length/fig' + str(int(alt_range[i]))
+			title = str(alt_range[i]*3.28084) + str('ft')
+			plt.title(title)
+
+
+			plt.savefig(name)
+
+			plt.close()			
+
+
+
+	def multicore_animate_range(self,downstream_factor=1.2,chr_mesh_n=50,no_core=1):
+ #3.28084
+
+		alt_range = np.linspace(0,12000,self.no_alt_range_int)
+		alt_range_split = np.split(alt_range,no_core)
+		plug_nozzle_class = self.__design_angelino_nozzle(self.design_alt_init,self.truncate_ratio_init,self.CEA,self.r_e)
+		
+
+		for i in range(no_core):
+
+			args = (plug_nozzle_class,alt_range_split[i],downstream_factor,chr_mesh_n)
+			proc = mp.Process(target=self.animate_over_range, args = args)
+			proc.start()
+
+
 
 	def cost_opt_contour_params(self,params): 
 		"""params = np.concatenate((spike_opt.x,spike_opt.y))
@@ -246,17 +287,20 @@ if __name__ == '__main__':
 
 
 
-	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=30,no_alt_range = 16,no_core=4)
+	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=30,no_alt_range = 60,no_core=4)
 
-
+	optimizer.multicore_animate_range(downstream_factor=1.2,chr_mesh_n=30,no_core=4)
 	# contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))
 
 	# print(optimizer.cost_opt_contour_params(contours))
 
 	#print(optimizer.cost_opt_design_params([design_alt,truncate_ratio]))
 	#plt.legend()
-	optimizer.animate_to_its([30,50,812])
-	plt.show()
+
+	#optimizer.multicore_animate_to_its(812,4)
+
+
+	## NEXT JOB, CHANGE TRUNCATION LENGTH TO 0.2, PLOT MACH NUMBER
 # def cost_opt_design_params(params) : return cost_func_design_params(params,T_w,CEA,r_e,alpha,beta,chr_mesh_n=30,no_core=4)
 
 # print(cost_opt_design_params([design_alt,truncate_ratio]))

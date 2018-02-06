@@ -236,6 +236,7 @@ class aerospike_optimizer():
 
 			ax1.set_ylim([-0.1,0.1])
 			ax1.set_xlim([-0.01,0.26])
+			ax1.set_xlabel("Pressure (bar)")
 			# plt.scatter(MOC_mesh.x,MOC_mesh.y,c=MOC_mesh.M,cmap=cm.coolwarm)
 			# plt.scatter(MOC_mesh.x,MOC_mesh.y*-1,c=MOC_mesh.M,cmap=cm.coolwarm)
 			contourf_grid = 1000
@@ -244,10 +245,11 @@ class aerospike_optimizer():
 			y_plt = np.linspace(MOC_mesh.y.min(),MOC_mesh.y.max(),contourf_grid)
 			X_plt,Y_plt = np.meshgrid(x_plt,y_plt)
 
-			p_contour=interpolate.griddata((MOC_mesh.x,MOC_mesh.y),MOC_mesh.p,(X_plt,Y_plt),method='linear')
-			M_fill = ax1.contourf(X_plt,Y_plt,p_contour,cmap=cm.jet)
+			M_contour=interpolate.griddata((MOC_mesh.x,MOC_mesh.y),MOC_mesh.M,(X_plt,Y_plt),method='linear')
+			M_fill = ax1.contourf(X_plt,Y_plt,M_contour,cmap=cm.jet,vmin=1,vmax=5)
+
 			#v=np.linspace(0,5,10)
-			ax1.contourf(X_plt,-1*Y_plt,p_contour,cmap=cm.jet)
+			ax1.contourf(X_plt,-1*Y_plt,M_contour,cmap=cm.jet,vmin=1,vmax=5)
 			plt.colorbar(M_fill,ax=ax1)
 			#plt.clim(0,5)
 			name = 'animation_4_full_length_p/fig' + str(int(alt_range[i]))
@@ -304,7 +306,7 @@ class aerospike_optimizer():
 if __name__ == '__main__':
 
 	## CONSTANTS OF DESIGN FOR AERODYNAMICS
-	r_e = 0.067/2 #0.034 # likely too large
+	r_e = 0.027 #0.034 # likely too large
 
 	## CONSTANTS OF DESIGN FOR HEAT FLUX
 	#user input variable in metric units:
@@ -314,16 +316,16 @@ if __name__ == '__main__':
 	## CONSTANTS OF SIM
 	alpha = 0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
 	beta = 1
-	design_alt = 6000
+	design_alt = 9814
 	truncate_ratio = 1.0# bounds on truncate < 0.1425
 
 	CEA = CEA_constants(0) # not a functioning class as of now
 
 
 
-	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=30,no_alt_range = 600,no_core=4)
+	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=150,no_alt_range = 600,no_core=8)
 
-	optimizer.multicore_animate_range(downstream_factor=1.2,chr_mesh_n=120,no_core=4)
+	optimizer.multicore_animate_range(downstream_factor=1.2,chr_mesh_n=150,no_core=8)
 	# contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))
 
 	# print(optimizer.cost_opt_contour_params(contours))

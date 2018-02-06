@@ -1,7 +1,0 @@
-import os
-
-files = os.listdir()
-files = sorted(files,key=str.lower)
-for i in range(len(files)):
-	new_name = 'pic' + str(i) + '.png'
-	os.rename(files[i],new_name)

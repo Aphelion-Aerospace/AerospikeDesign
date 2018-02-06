@@ -46,10 +46,10 @@ rail_len = 15;              %Launch rail length (m).
 comb_eff = 0.9;    %Combustive efficiency.
 nozz_eff = 1;    %Nozzle efficiency.
 P_a = 67461.44663;          %Ambient pressure at launch altitude (Pa).
-T_a = imported(5);          %Ambient temperature at launch altitude (K).
-m = imported(6);            %Rocket dry mass (kg).
+T_a = 290.35;          %Ambient temperature at launch altitude (K).
+m = 45;            %Rocket dry mass (kg).
 rho_fuel = 950;     %Mass density of fuel (kg/m^3).
-rocket_length = imported(25);   %Total length of rocket (m).
+rocket_length = 6;   %Total length of rocket (m).
 
 %CEA interpolation data:
 num_rows = 356;     %# rows to import in CEA data file (= last row # - 1).
@@ -74,8 +74,8 @@ v_D = 0;            %Drag [velocity] loss (m/s).
 f_D = 0.03;
 L_fs = 0.00889;
 d_fs = 0.0254;
-A_inj = imported(21);
-Cd = imported(22);
+A_inj = 9.60607*10.^-5;
+Cd = 0.6;
 s = zeros(2, its);  %Position vector (m).
 v = s;              %Velocity vector (m/s).
 a = s;              %Acceleration vector (m/s^2).
@@ -91,17 +91,17 @@ P_ox = F;           %Ox tank pressure array (Pa).
 C_D = F;            %Drag coefficient array
 F_D = F;            %Drag force array (N).
 m_f = F;            %Fuel mass array (kg).
-m_f(1) = imported(7);       %Initial fuel mass (kg).
-diam = imported(20);        %Diameter of rocket (m).
+m_f(1) = 5.082836133;       %Initial fuel mass (kg).
+diam = 0.1397;        %Diameter of rocket (m).
 dtheta = 0;     %change in the angle of rocket with respect to vertical 
                 %this is zero since we are not accoutning for crosswind yet    
 
 %Ox tank parameters:
 m_ox = F;
-m_ox(1) = imported(9);      %Loaded liquid ox mass in tank (kg).
+m_ox(1) = 22.8727626;      %Loaded liquid ox mass in tank (kg).
 T_ox = T_a;                 %Initial ox tank temperature (K).
-V_tank = imported(10);      %Internal volume of ox tank (m^3).
-m_tank = imported(11);      %Dry mass of ox tank (kg).
+V_tank = 0.0;      %Internal volume of ox tank (m^3).
+m_tank = 18.5578;      %Dry mass of ox tank (kg).
 P_ox(1) = 4826330.105;      %Initial ox tank pressure (Pa).
 Q = [2.781; 0.27244; 309.57; 0.2882];
         %Coefficients for molar specific vol. of liq. N2O (m^3/kmol).
@@ -115,9 +115,9 @@ n(2) = P_ox(1)*(V_tank - n_tot*Vhat_l)/(R_u*T_ox - P_ox(1)*Vhat_l);
 %Fuel core parameters:
 a0 = 0.000155;          %Regression rate coefficient (m/s^2).
 n_reg = 0.5;    %FLUX EXP???   %Regression rate exponent.
-num_ports = %%???  %# combustion ports in fuel grain.
+num_ports = 1%%???  %# combustion ports in fuel grain.
 L = 0.3048;         %% comb. chamberfull length??  %Fuel core length (m).
-w = imported(16);      %?????     %Initial fuel web thickness (m).
+w = 0.0249;      %?????     %Initial fuel web thickness (m).
 r_fo = 0.068/2          %Inner combustion chamber radius (m).
 A_cc = pi*r_fo^2;           %Combustion chamber cross-section area (m^2).
 

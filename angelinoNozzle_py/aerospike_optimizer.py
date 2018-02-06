@@ -62,11 +62,11 @@ class aerospike_optimizer():
 		self.no_alt_range_int = int(no_core*round(no_alt_range/no_core))
 		self.no_core = no_core
 
-		self.spike_init = self.__design_angelino_nozzle(design_alt,truncate_ratio,CEA,r_e)
+		self.CEA = CEA_constants(0)		
+		self.spike_init = self.__design_angelino_nozzle(design_alt_init,truncate_ratio_init,self.CEA,r_e)
 
 		self.spike_opt = copy.deepcopy(self.spike_init)
 
-		self.CEA = CEA_constants(0)
 
 	def __compute_thrust_over_range(self,plug_nozzle_class,alt_range,gamma,send_end,downstream_factor=1.2,chr_mesh_n=50):
 		"""Function that computes the thrust at each point over a specified range, intended to be used as apart of a process
@@ -122,6 +122,8 @@ class aerospike_optimizer():
 		return thrust_range
 
 	def __design_angelino_nozzle(self,design_alt,truncate_ratio,CEA,r_e):
+		""" Can be a class function, will edit going forwards
+		"""
 		(p_atm,T_atm,rho_atm) = gd.standard_atmosphere([design_alt])
 
 		PR = CEA.p_c/p_atm
@@ -134,7 +136,7 @@ class aerospike_optimizer():
 
 		A_t = r_e**2*np.pi/expansion_ratio # max expansion (r_b = 0, r_e**2 >= A_t*expansion_ratio/np.pi)
 
-		return plug_nozzle(expansion_ratio,A_t,r_e,CEA.gamma,CEA.T_c,CEA.p_c,CEA.a_c,CEA.rho_c,100,truncate_ratio = truncate_ratio)
+		return plug_nozzle(expansion_ratio,A_t,r_e,CEA.gamma,CEA.T_c,CEA.p_c,CEA.a_c,CEA.rho_c,1500,truncate_ratio = truncate_ratio)
 
 	def __cost_end_func(self,no_alt_range_int,spike,CEA,downstream_factor=1.2,chr_mesh_n=120,no_core=1):
 		alt_range = np.linspace(0,9144,no_alt_range_int)

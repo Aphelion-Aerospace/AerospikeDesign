@@ -53,7 +53,7 @@ if __name__=="__main__":
 
 	# cea vals
 	CEA = CEA_constants(altitude)
-	expansion_ratio_zero(M_1,M_2,gamma,epsilon)
+	expansion_ratio_zero(M_1,M_2,CEA.gamma,epsilon)
 
 
 	plt.plot(x_lower,y_lower)

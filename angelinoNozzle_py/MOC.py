@@ -431,6 +431,8 @@ class chr_mesh():
         #takes chr_array obj points to arrays
     def calc_flow_properties(self):
         T_ratio,p_ratio,rho_ratio,a_ratio = gd.isentropic_ratios(0,self.M,self.gamma)
+        if(p_ratio > 1):
+            print('ERROR')
         self.T = self.spike.T_c*T_ratio
         self.p = self.spike.p_c*p_ratio   
         self.a = self.spike.a_c*a_ratio

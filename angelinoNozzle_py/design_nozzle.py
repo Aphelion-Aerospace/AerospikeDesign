@@ -2,33 +2,11 @@ from plug_nozzle_angelino import *
 import matplotlib.pyplot as plt
 from scipy import interpolate
 import numpy as np
-
-def calc_line_intr(m1,x1,y1,m2,x2,y2):
-    # takes in parameters for two lines in point slope form and returns their intercept
-    if abs(m1) > 10**12:
-        m1 = np.inf
-    if abs(m2) > 10**12:
-        m2 = np.inf
-     
-    if(np.isinf(m1)):
-        if(np.isinf(m2)):
-            raise ValueError('Both slopes inf, no intercept')
-        else:
-            x = x1
-            y = m2*(x-x2) + y2
-    elif(np.isinf(m2)):
-        x = x2
-        y = m1*(x-x1) + y1
-    else:
-        x = (y2 - y1 - m2*x2 + m1*x1)/(m1-m2)
-        y = m1*(x-x1) + y1
-    
-    return x,y
-
-n = 20
+import aerospike_optimzer
 
 
-r_e = 0.067/2 #0.034 # likely too large
+
+r_e = 0.027 #0.034 # likely too large
 expansion_ratio = 6.64 #8.1273
 A_t = r_e**2*np.pi/expansion_ratio # max expansion (r_b = 0, r_e**2 >= A_t*expansion_ratio/np.pi)
 gamma = 1.2343# np.mean([1.2534,1.2852])

@@ -116,6 +116,8 @@ class aerospike_optimizer():
 
 		thrust_range = np.concatenate(thrust_range)
 
+		plt.plot(altitude_range,thrust_range,'o')
+		plt.show()
 		# for thread in threads:
 		# 	thread.map
 
@@ -206,8 +208,8 @@ if __name__ == '__main__':
 
 
 	## CONSTANTS OF SIM
-	alpha = 0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
-	beta = 1
+	alpha = 1#0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
+	beta = 0#1
 	design_alt = 6000
 	truncate_ratio = 1.0# bounds on truncate < 0.1425
 
@@ -215,7 +217,7 @@ if __name__ == '__main__':
 
 
 
-	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=30,no_alt_range = 16,no_core=4)
+	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=130,no_alt_range = 16,no_core=4)
 
 
 	contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))

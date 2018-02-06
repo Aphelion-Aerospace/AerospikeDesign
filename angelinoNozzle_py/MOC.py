@@ -431,7 +431,7 @@ class chr_mesh():
         #takes chr_array obj points to arrays
     def calc_flow_properties(self):
         T_ratio,p_ratio,rho_ratio,a_ratio = gd.isentropic_ratios(0,self.M,self.gamma)
-        if(p_ratio > 1):
+        if((p_ratio > 1).max()) ==True:
             print('ERROR')
         self.T = self.spike.T_c*T_ratio
         self.p = self.spike.p_c*p_ratio   
@@ -535,8 +535,8 @@ class chr_mesh():
         thrust_grid = rho_grid*Ve_grid**2*A ## CHECK THIS!!!!!!!
         thrust_momentum = np.trapz(thrust_grid,y_points) # check with emerson
         #thrust_pressure = np.trapz((P_2D),on_contour_x) # check with emerson
-
-        return thrust_momentum #+ thrust_pressure
+        thrust_pressure = np.trapz((P_grid-self.p_atm)*A,y_points)
+        return thrust_momentum+ thrust_pressure
         #FUN PLOTS
         # print(thrust_momentum)
         # print(thrust_pressure)

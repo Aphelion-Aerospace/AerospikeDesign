@@ -222,7 +222,7 @@ class aerospike_optimizer():
 			plt.savefig(name)
 			plt.close()
 
-	def animate_over_range(self,plug_nozzle_class,alt_range,flight_range,downstream_factor=1.2,chr_mesh_n=50):
+	def animate_over_range(self,plug_nozzle_class,CEA,alt_range,flight_range,downstream_factor=1.2,chr_mesh_n=50):
 		
 		for i in range(alt_range.shape[0]):
 
@@ -286,7 +286,7 @@ class aerospike_optimizer():
 
 		for i in range(no_core):
 
-			args = (plug_nozzle_class,alt_range_split[i],flight_range_split[i],downstream_factor,chr_mesh_n)
+			args = (plug_nozzle_class,self.CEA,alt_range_split[i],flight_range_split[i],downstream_factor,chr_mesh_n)
 			proc = mp.Process(target=self.animate_over_range, args = args)
 			proc.start()
 

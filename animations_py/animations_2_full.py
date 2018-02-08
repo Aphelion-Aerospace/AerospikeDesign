@@ -227,7 +227,7 @@ class aerospike_optimizer():
 		for i in range(alt_range.shape[0]):
 
 			fig, (ax1,ax2) = plt.subplots(1,2,gridspec_kw={'width_ratios':[8,1]})
-			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,CEA.gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor,plot_chr=0,clean_mesh=0)
+			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,CEA.gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor,plot_chr=0,clean_mesh=1)
 		
 
 			plug_nozzle_class.plot_contour(ax1)
@@ -236,7 +236,6 @@ class aerospike_optimizer():
 
 			ax1.set_ylim([-0.1,0.1])
 			ax1.set_xlim([-0.01,0.26])
-			ax1.set_xlabel("Pressure (bar)")
 			# plt.scatter(MOC_mesh.x,MOC_mesh.y,c=MOC_mesh.M,cmap=cm.coolwarm)
 			# plt.scatter(MOC_mesh.x,MOC_mesh.y*-1,c=MOC_mesh.M,cmap=cm.coolwarm)
 			contourf_grid = 1000
@@ -245,11 +244,11 @@ class aerospike_optimizer():
 			y_plt = np.linspace(MOC_mesh.y.min(),MOC_mesh.y.max(),contourf_grid)
 			X_plt,Y_plt = np.meshgrid(x_plt,y_plt)
 
-			M_contour=interpolate.griddata((MOC_mesh.x,MOC_mesh.y),MOC_mesh.M,(X_plt,Y_plt),method='linear')
-			M_fill = ax1.contourf(X_plt,Y_plt,M_contour,cmap=cm.jet,vmin=1,vmax=5)
+			M_contour=interpolate.griddata((MOC_mesh.x,MOC_mesh.y),MOC_mesh.T,(X_plt,Y_plt),method='linear')
+			M_fill = ax1.contourf(X_plt,Y_plt,M_contour,cmap=cm.jet)
 
 			#v=np.linspace(0,5,10)
-			ax1.contourf(X_plt,-1*Y_plt,M_contour,cmap=cm.jet,vmin=1,vmax=5)
+			ax1.contourf(X_plt,-1*Y_plt,M_contour,cmap=cm.jet)
 			plt.colorbar(M_fill,ax=ax1)
 			#plt.clim(0,5)
 			name = 'animation_4_full_length_p/fig' + str(int(alt_range[i]))
@@ -317,7 +316,7 @@ if __name__ == '__main__':
 	alpha = 0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
 	beta = 1
 	design_alt = 9814
-	truncate_ratio = 1.0# bounds on truncate < 0.1425
+	truncate_ratio = 0.2# bounds on truncate < 0.1425
 
 	CEA = CEA_constants(0) # not a functioning class as of now
 

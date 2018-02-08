@@ -22,9 +22,9 @@ class CEA_constants():
 		Returns:
 			Stores NASA CEA data in atributes
 		"""	
-		self.gamma = 1.2381 #np.mean([1.2534,1.2852])
-		self.T_c = 2833.63 # combustion chamber temperature
-		self.p_c = 34.474*10**5 # combustion chamber pressure
+		self.gamma = 1.237 #np.mean([1.2534,1.2852])
+		self.T_c = 2831.47 # combustion chamber temperature
+		self.p_c = 3102640.8 # combustion chamber pressure
 		self.rho_c = 3.3826 # combustion chamber density 
 		self.a_c = np.sqrt(self.gamma*(1-1/self.gamma)*200.07*self.T_c) # combustion chamber sound speed
 		self.Pr = 0.55645 #average throat to exit Prandtl's number
@@ -87,12 +87,13 @@ class aerospike_optimizer():
 		thrust_range = np.zeros(alt_range.shape)
 		for i in range(alt_range.shape[0]):
 			# print(alt_range[i])
-			try:
-				MOC_mesh = MOC.chr_mesh(plug_nozzle_class,gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor)
-				thrust_range[i] = MOC_mesh.compute_thrust('nearest',30)
-				print(thrust_range[i])
-			except:
-				thrust_range[i] = 0
+		
+			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor)
+			thrust_range[i] = MOC_mesh.compute_thrust('linear',30)
+			print(thrust_range[i])
+			# except:
+			# 	print("goofs and gafs")
+			# 	thrust_range[i] = 0
 		send_end.send(thrust_range)
 
 	def __multicore_thrust_compute(self,plug_nozzle_class,altitude_range,gamma,downstream_factor=1.2,chr_mesh_n=50,no_core=1):
@@ -200,7 +201,7 @@ class aerospike_optimizer():
 if __name__ == '__main__':
 
 	## CONSTANTS OF DESIGN FOR AERODYNAMICS
-	r_e = 0.067/2 #0.034 # likely too large
+	r_e = 0.027 #0.034 # likely too large
 
 	## CONSTANTS OF DESIGN FOR HEAT FLUX
 	#user input variable in metric units:
@@ -217,7 +218,7 @@ if __name__ == '__main__':
 
 
 
-	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=130,no_alt_range = 16,no_core=4)
+	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=120,no_alt_range = 32,no_core=4)
 
 
 	contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))

@@ -431,8 +431,7 @@ class chr_mesh():
         #takes chr_array obj points to arrays
     def calc_flow_properties(self):
         T_ratio,p_ratio,rho_ratio,a_ratio = gd.isentropic_ratios(0,self.M,self.gamma)
-        if((p_ratio > 1).max()) ==True:
-            print('ERROR')
+
         self.T = self.spike.T_c*T_ratio
         self.p = self.spike.p_c*p_ratio   
         self.a = self.spike.a_c*a_ratio
@@ -472,71 +471,98 @@ class chr_mesh():
         #print(len(self.ID_jet_boundary))
         self.ID_contour_chr,self.ID_jet_boundary = clean_ID_list(self.chr_array)
 
-    def compute_thrust(self,approx_method,n):       
-        # # constructing spline representation for jet boundary
-        jet_bound_x = np.concatenate((np.array([self.spike.lip_x]),self.x[self.ID_jet_boundary]))
-        jet_bound_y = np.concatenate((np.array([self.spike.lip_y]),self.y[self.ID_jet_boundary]))
+    def clean_arrays_idx(self,np_arrays):
+        valid_idx_list = []
+        for array in np_arrays:
+            valid_idx_list.append(~np.isnan(array))
+        clean_idx = valid_idx_list.pop(0)
+        for idx_logical in valid_idx_list:
+            clean_idx = np.logical_and(clean_idx,idx_logical)
+        clean_np_arrays = []
+        for array in np_arrays:
+            new_array = array[clean_idx]
+            #print(new_array)
+            clean_np_arrays.append(new_array)
+        return clean_np_arrays
+
+
+    def compute_thrust(self,approx_method,n,method="End Plane"):     
+        if (method == "End Plane"):
+            # End Plane
+            # # constructing spline representation for jet boundary
+            jet_bound_x = np.concatenate((np.array([self.spike.lip_x]),self.x[self.ID_jet_boundary]))
+            jet_bound_y = np.concatenate((np.array([self.spike.lip_y]),self.y[self.ID_jet_boundary]))
+            
+            # filter for uniques
+            jet_bound_x, indices = np.unique(jet_bound_x, return_index=True)
+            jet_bound_y = jet_bound_y[indices]
+
+            try:
+            #constructing jet boundary spline
+                tck_jet_bound = interpolate.splrep(jet_bound_x,jet_bound_y)
+            except TypeError:
+                print(self.altitude)
+                print(str(jet_bound_x))
+                print(str(jet_bound_y))
+           
+            # constructing plane on which to evaluate expanded gas properties
+            x_plane = np.ones(n,)*self.x[self.ID_contour_chr[-1]];
+            y_points = np.linspace(0,interpolate.splev(self.x[self.ID_contour_chr[-1]],tck_jet_bound),n);
+            #plt.plot(x_plane,y_points,'ro')
+            # constructing rbf functions for interpolation of properties
+            V_grid = interpolate.griddata((self.x,self.y),self.V,(x_plane,y_points),method=approx_method) # nearest and cubic may also work 
+            T_grid = interpolate.griddata((self.x,self.y),self.T,(x_plane,y_points),method=approx_method)
+            theta_grid = interpolate.griddata((self.x,self.y),self.theta,(x_plane,y_points),method=approx_method)
+            rho_grid = interpolate.griddata((self.x,self.y),self.rho,(x_plane,y_points),method=approx_method)
+            P_grid = interpolate.griddata((self.x,self.y),self.p,(x_plane,y_points),method=approx_method)
+
+            (x_plane,y_points,V_grid,T_grid,theta_grid,rho_grid,P_grid) = self.clean_arrays_idx((x_plane,y_points,V_grid,T_grid,theta_grid,rho_grid,P_grid))
+            #print((x_plane,y_points,V_grid,T_grid,theta_grid,rho_grid,P_grid))
         
-        # filter for uniques
-        jet_bound_x, indices = np.unique(jet_bound_x, return_index=True)
-        jet_bound_y = jet_bound_y[indices]
+            #computing thrust
+            Ve_grid = V_grid*np.cos(theta_grid) # V*cos(theta)*r *dr 
+            # fig1, (ax1) = plt.subplots(1,1)
+            # vel_plot = ax1.scatter(y_points,Ve_grid)
+            # vel_label = 'Ve ' + str(self.altitude)
+            # print(vel_label)
+            # plt.plot(y_points,Ve_grid,label = vel_label)
 
-        try:
-        #constructing jet boundary spline
-            tck_jet_bound = interpolate.splrep(jet_bound_x,jet_bound_y)
-        except TypeError:
-            print(self.altitude)
-            print(str(jet_bound_x))
-            print(str(jet_bound_y))
-       
-        # constructing plane on which to evaluate expanded gas properties
-        x_plane = np.ones(n,)*self.x[self.ID_contour_chr[-1]];
-        y_points = np.linspace(0,interpolate.splev(self.x[self.ID_contour_chr[-1]],tck_jet_bound),n);
-        #plt.plot(x_plane,y_points,'ro')
-        # constructing rbf functions for interpolation of properties
-        V_grid = interpolate.griddata((self.x,self.y),self.V,(x_plane,y_points),method=approx_method) # nearest and cubic may also work 
-        T_grid = interpolate.griddata((self.x,self.y),self.T,(x_plane,y_points),method=approx_method)
-        theta_grid = interpolate.griddata((self.x,self.y),self.theta,(x_plane,y_points),method=approx_method)
-        rho_grid = interpolate.griddata((self.x,self.y),self.rho,(x_plane,y_points),method=approx_method)
-        P_grid = interpolate.griddata((self.x,self.y),self.p,(x_plane,y_points),method=approx_method)
-        #computing thrust
-        Ve_grid = V_grid*np.cos(theta_grid) # V*cos(theta)*r *dr 
-        # fig1, (ax1) = plt.subplots(1,1)
-        # vel_plot = ax1.scatter(y_points,Ve_grid)
-        # vel_label = 'Ve ' + str(self.altitude)
-        # print(vel_label)
-        # plt.plot(y_points,Ve_grid,label = vel_label)
+            tck_contour = interpolate.splrep(self.spike.x,self.spike.y)
 
-        tck_contour = interpolate.splrep(self.spike.x,self.spike.y)
+            
 
-        
-
-        on_nozzle_idx = self.x[self.ID_contour_chr] < self.spike.x.max()
-        on_contour_x = self.x[self.ID_contour_chr][on_nozzle_idx]
-        on_contour_y = self.y[self.ID_contour_chr][on_nozzle_idx]
+            # on_nozzle_idx = self.x[self.ID_contour_chr] < self.spike.x.max()
+            # on_contour_x = self.x[self.ID_contour_chr][on_nozzle_idx]
+            # on_contour_y = self.y[self.ID_contour_chr][on_nozzle_idx]
 
 
-        # print('thurst!')
-        # plt.plot(on_contour_x,on_contour_y,'x')
-        # plt.show()
-        contour_der = interpolate.splev(on_contour_x,tck_contour,der=1)
+            # print('thurst!')
+            # plt.plot(on_contour_x,on_contour_y,'x')
+            # plt.show()
+            # contour_der = interpolate.splev(on_contour_x,tck_contour,der=1)
 
-        contour_angle = np.arctan(contour_der)
-        
+            # contour_angle = np.arctan(contour_der)
+            
 
-        P_contour = interpolate.griddata((self.x,self.y),self.p,(on_contour_x,on_contour_y),method=approx_method) - self.p_atm
+            # P_contour = interpolate.griddata((self.x,self.y),self.p,(on_contour_x,on_contour_y),method=approx_method) - self.p_atm
 
-        P_2D = P_contour*np.sqrt(contour_der**2+1)*2*np.pi*np.sin(contour_angle)*2*np.pi*on_contour_y
-        # p_label = 'P ' + str(self.altitude) + ', patm:' + str(self.p_atm)
-        # plt.plot(y_points,np.cos(theta_grid),label =p_label)
-        # plt.legend()
-        #plt.show()
-        A = y_points*2*np.pi
-        thrust_grid = rho_grid*Ve_grid**2*A ## CHECK THIS!!!!!!!
-        thrust_momentum = np.trapz(thrust_grid,y_points) # check with emerson
-        #thrust_pressure = np.trapz((P_2D),on_contour_x) # check with emerson
-        thrust_pressure = np.trapz((P_grid-self.p_atm)*A,y_points)
-        return thrust_momentum+ thrust_pressure
+            # P_2D = P_contour*np.sqrt(contour_der**2+1)*2*np.pi*np.sin(contour_angle)*2*np.pi*on_contour_y
+            # p_label = 'P ' + str(self.altitude) + ', patm:' + str(self.p_atm)
+            # plt.plot(y_points,np.cos(theta_grid),label =p_label)
+            # plt.legend()
+            #plt.show()
+            A = y_points*2*np.pi
+            thrust_grid = rho_grid*Ve_grid**2*A ## CHECK THIS!!!!!!!
+            thrust_momentum = np.trapz(thrust_grid,y_points) # check with emerson
+            #thrust_pressure = np.trapz((P_2D),on_contour_x) # check with emerson
+            thrust_pressure = np.trapz((P_grid-self.p_atm)*A,y_points)
+
+        else:
+            # Thrust plane
+            pass
+
+
+        return thrust_momentum#+ thrust_pressure
         #FUN PLOTS
         # print(thrust_momentum)
         # print(thrust_pressure)

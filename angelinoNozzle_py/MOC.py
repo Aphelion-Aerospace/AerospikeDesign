@@ -507,7 +507,7 @@ class chr_mesh():
            
             # constructing plane on which to evaluate expanded gas properties
             x_plane = np.ones(n,)*self.x[self.ID_contour_chr[-1]];
-            y_points = np.linspace(0,interpolate.splev(self.x[self.ID_contour_chr[-1]],tck_jet_bound),n);
+            y_points = np.linspace(0,self.y.min(),n)#y_points = np.linspace(0,interpolate.splev(self.x[self.ID_contour_chr[-1]],tck_jet_bound),n);
             #plt.plot(x_plane,y_points,'ro')
             # constructing rbf functions for interpolation of properties
             V_grid = interpolate.griddata((self.x,self.y),self.V,(x_plane,y_points),method=approx_method) # nearest and cubic may also work 
@@ -562,7 +562,7 @@ class chr_mesh():
             pass
 
 
-        return thrust_momentum#+ thrust_pressure
+        return thrust_momentum+ thrust_pressure
         #FUN PLOTS
         # print(thrust_momentum)
         # print(thrust_pressure)

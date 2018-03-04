@@ -226,29 +226,32 @@ class aerospike_optimizer():
 		
 		for i in range(alt_range.shape[0]):
 
-			fig, (ax1,ax2) = plt.subplots(1,2,gridspec_kw={'width_ratios':[8,1]})
-			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,CEA.gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor,plot_chr=0,clean_mesh=1)
+			fig, (ax1,ax2) = plt.subplots(1,2)#,gridspec_kw={'width_ratios':[8,1]})
+			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,CEA.gamma,alt_range[i],chr_mesh_n,downstream_factor=5,plot_chr=0,clean_mesh=1)
 		
-
 			plug_nozzle_class.plot_contour(ax1)
 			plug_nozzle_class.y = plug_nozzle_class.y*-1; plug_nozzle_class.lip_y = plug_nozzle_class.lip_y*-1
 			plug_nozzle_class.plot_contour(ax1)
+			ax1.plot([plug_nozzle_class.x[-1],plug_nozzle_class.x[-1]],[plug_nozzle_class.y[-1],plug_nozzle_class.y[-1]*-1],'b-')
+			ax1.set_ylim([-0.1,0.1])#ax1.set_ylim([-0.05,0.05])# 
+			ax1.set_xlim([-0.01,0.26])#ax1.set_xlim([-0.01,0.05])# 
 
-			ax1.set_ylim([-0.1,0.1])
-			ax1.set_xlim([-0.01,0.26])
-			# plt.scatter(MOC_mesh.x,MOC_mesh.y,c=MOC_mesh.M,cmap=cm.coolwarm)
-			# plt.scatter(MOC_mesh.x,MOC_mesh.y*-1,c=MOC_mesh.M,cmap=cm.coolwarm)
 			contourf_grid = 1000
 
 			x_plt = np.linspace(MOC_mesh.x.min(),MOC_mesh.x.max(),contourf_grid)
 			y_plt = np.linspace(MOC_mesh.y.min(),MOC_mesh.y.max(),contourf_grid)
 			X_plt,Y_plt = np.meshgrid(x_plt,y_plt)
-
+		
 			M_contour=interpolate.griddata((MOC_mesh.x,MOC_mesh.y),MOC_mesh.T,(X_plt,Y_plt),method='linear')
+			inner_contour_tck = interpolate.splrep(MOC_mesh.x[MOC_mesh.ID_contour_chr],MOC_mesh.y[MOC_mesh.ID_contour_chr])
+			def contour_curve(x):
+				return interpolate.splev(x,inner_contour_tck)
+			M_contour[Y_plt > contour_curve(X_plt)] = np.nan 
+
 			M_fill = ax1.contourf(X_plt,Y_plt,M_contour,cmap=cm.jet)
 
 			#v=np.linspace(0,5,10)
-			ax1.contourf(X_plt,-1*Y_plt,M_contour,cmap=cm.jet)
+			#ax1.contourf(X_plt,-1*Y_plt,M_contour,cmap=cm.jet)
 			plt.colorbar(M_fill,ax=ax1)
 			#plt.clim(0,5)
 			name = 'animation_4_full_length_p/fig' + str(int(alt_range[i]))
@@ -256,18 +259,23 @@ class aerospike_optimizer():
 			#plt.suptitle(title,fontsize=40)
 			ax1.set_aspect('equal','box')
 
-			ax2.xaxis.set_visible(False); 
+			#ax2.xaxis.set_visible(False); 
 
 			x_flight = np.linspace(0,flight_range[i])
-			ax2.plot(x_flight,60000*self.__fake_flight_parabola(x_flight))
-			ax2.plot(flight_range[i],60000*self.__fake_flight_parabola(flight_range[i]),'rx')
-			ax2.set_ylim([0,60000])
-			ax2.set_yticks([0,10000,20000,30000,40000,50000,60000])
-			ax2.set_xlim([0,1])
+
+			# ax2.plot(plug_nozzle_class.x*1000,plug_nozzle_class.T)
+			# ax2.set_xlabel('x (mm)')
+			# ax2.set_ylabel('Temperature (K)')
+			# ax2.plot(x_flight,60000*self.__fake_flight_parabola(x_flight))
+			# ax2.plot(flight_range[i],60000*self.__fake_flight_parabola(flight_range[i]),'rx')
+			# ax2.set_ylim([0,60000])
+			# ax2.set_yticks([0,10000,20000,30000,40000,50000,60000])
+			# ax2.set_xlim([0,1])
 			fig.set_size_inches(18.5,10.5)
 			plt.savefig(name,dpi=100)
 
 			plt.close()	
+
 
 	def __fake_flight_parabola(self,x):
 		return -(x-1)**2 + 1	
@@ -315,16 +323,16 @@ if __name__ == '__main__':
 	## CONSTANTS OF SIM
 	alpha = 0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
 	beta = 1
-	design_alt = 9814
+	design_alt = 9144
 	truncate_ratio = 0.2# bounds on truncate < 0.1425
 
 	CEA = CEA_constants(0) # not a functioning class as of now
 
 
 
-	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=150,no_alt_range = 600,no_core=8)
+	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=200,no_alt_range = 600,no_core=4)
 
-	optimizer.multicore_animate_range(downstream_factor=1.2,chr_mesh_n=150,no_core=8)
+	optimizer.multicore_animate_range(downstream_factor=1.2,chr_mesh_n=200,no_core=4)
 	# contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))
 
 	# print(optimizer.cost_opt_contour_params(contours))

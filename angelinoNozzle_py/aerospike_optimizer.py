@@ -89,7 +89,7 @@ class aerospike_optimizer():
 			# print(alt_range[i])
 		
 			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,gamma,alt_range[i],chr_mesh_n,downstream_factor=downstream_factor)
-			thrust_range[i] = MOC_mesh.compute_thrust('linear',30)
+			thrust_range[i] = MOC_mesh.compute_thrust('linear',100)
 			print(thrust_range[i])
 			# except:
 			# 	print("goofs and gafs")
@@ -118,7 +118,7 @@ class aerospike_optimizer():
 		thrust_range = np.concatenate(thrust_range)
 
 		plt.plot(altitude_range,thrust_range,'o')
-		plt.show()
+	
 		# for thread in threads:
 		# 	thread.map
 
@@ -148,7 +148,7 @@ class aerospike_optimizer():
 		np.random.shuffle(alt_range)
 		(p_atm_r,T_atm_r,rho_atm_r) = gd.standard_atmosphere(alt_range)
 
-		thrust_range = self.__multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=1.2,chr_mesh_n=chr_mesh_n,no_core=no_core)
+		thrust_range = self.__multicore_thrust_compute(spike,alt_range,CEA.gamma,downstream_factor=downstream_factor,chr_mesh_n=chr_mesh_n,no_core=no_core)
 
 		# unshuffle arrays
 		ordered_idx = np.argsort(alt_range)
@@ -174,8 +174,8 @@ class aerospike_optimizer():
 		spike.x = x_vals; spike.y = y_vals
 
 
-		work, total_heat_flux = self.__cost_end_func(no_alt_range_int,spike,CEA,downstream_factor=1.2,chr_mesh_n=chr_mesh_n,no_core=no_core)
-		print(total_heat_flux)
+		work, total_heat_flux = self.__cost_end_func(no_alt_range_int,spike,CEA,downstream_factor=5.0,chr_mesh_n=chr_mesh_n,no_core=no_core)
+		print('Total Heat = ' +str(total_heat_flux))
 		return -alpha*work + beta*total_heat_flux
 		
 	def __cost_func_design_params(self,params,T_w,CEA,r_e,alpha,beta,chr_mesh_n,no_alt_range_int,no_core):
@@ -211,22 +211,39 @@ if __name__ == '__main__':
 	## CONSTANTS OF SIM
 	alpha = 1#0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
 	beta = 0#1
-	design_alt = 6000
-	truncate_ratio = 1.0# bounds on truncate < 0.1425
+	design_alt = 9144
+	truncate_ratio = 0.2# bounds on truncate < 0.1425
 
 	CEA = CEA_constants(0) # not a functioning class as of now
 
 
 
-	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=120,no_alt_range = 32,no_core=4)
-
+	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=100,no_alt_range = 32,no_core=4)
 
 	contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))
 
-	print(optimizer.cost_opt_contour_params(contours))
+	#optimizer_old = aerospike_optimizer(r_e,T_w,alpha,beta,6000,truncate_ratio,chr_mesh_n=120,no_alt_range=32,no_core=4)
+
+	optimizer_old = aerospike_optimizer(r_e,T_w,alpha,beta,6000,truncate_ratio,chr_mesh_n=100,no_alt_range = 32,no_core=4)
+
+	contours = np.concatenate((optimizer_old.spike_opt.x,optimizer_old.spike_opt.y))
+
+	#optimizer_old = aerospike_optimizer(r_e,T_w,alpha,beta,6000,truncate_ratio,chr_mesh_n=120,no_alt_range=32,no_core=4)
+
+	# print(optimizer_old.cost_opt_contour_params(contours))
+	# print(optimizer.cost_opt_contour_params(contours))
+
 
 	#print(optimizer.cost_opt_design_params([design_alt,truncate_ratio]))
 	#plt.legend()
+
+	plt.plot(optimizer.spike_init.x,optimizer.spike_init.y,'b-',optimizer.spike_init.lip_x,optimizer.spike_init.lip_y,'bx',label='Optimized Spike')
+	plt.plot(optimizer_old.spike_init.x,optimizer_old.spike_init.y,'r--',optimizer_old.spike_init.lip_x,optimizer_old.spike_init.lip_y,'rx',label='Old Spike')
+	plt.plot([optimizer_old.spike_init.x[-1],optimizer_old.spike_init.x[-1]],[optimizer_old.spike_init.y[-1],0],'r--')
+	plt.plot([optimizer.spike_init.x[-1],optimizer.spike_init.x[-1]],[optimizer.spike_init.y[-1],0],'b-')
+	plt.plot(optimizer.spike_init.x,np.zeros(optimizer.spike_init.x.shape),'k-')
+	plt.axis('equal')
+	plt.legend()
 	plt.show()
 # def cost_opt_design_params(params) : return cost_func_design_params(params,T_w,CEA,r_e,alpha,beta,chr_mesh_n=30,no_core=4)
 

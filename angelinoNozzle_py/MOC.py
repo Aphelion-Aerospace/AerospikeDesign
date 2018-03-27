@@ -429,6 +429,7 @@ class chr_mesh():
             self.theta = np.append(self.theta,point.theta)
 
         #takes chr_array obj points to arrays
+
     def calc_flow_properties(self):
         T_ratio,p_ratio,rho_ratio,a_ratio = gd.isentropic_ratios(0,self.M,self.gamma)
 
@@ -437,6 +438,16 @@ class chr_mesh():
         self.a = self.spike.a_c*a_ratio
         self.rho = self.spike.rho_c*rho_ratio
 
+    def save_to_csv(self):
+        ## string_time for MOC_csv + string_time
+        save_name = 'MOC_mesh.csv'
+        csv_array = np.array([self.x,self.y,self.M,self.mu,self.V,self.theta,self.T,self.p,self.a,self.rho])
+        np.savetxt(save_name,csv_array.T, delimiter=',')
+
+        with open(save_name,'r') as original:
+            data = original.read()
+        with open(save_name,'w') as modified:
+            modified.write('x,y,M,mu,V,theta,T,p,a,rho\n' + data)
 
     def clean_data(self):
 
@@ -529,40 +540,22 @@ class chr_mesh():
 
             tck_contour = interpolate.splrep(self.spike.x,self.spike.y)
 
-            
+            dA = 2*np.pi*y_points
+            thrust_momentum = np.trapz(rho_grid*Ve_grid**2*dA,y_points)
 
-            # on_nozzle_idx = self.x[self.ID_contour_chr] < self.spike.x.max()
-            # on_contour_x = self.x[self.ID_contour_chr][on_nozzle_idx]
-            # on_contour_y = self.y[self.ID_contour_chr][on_nozzle_idx]
+            thrust_pressure = np.trapz((P_grid-self.p_atm)*dA,y_points)
 
+            print('m_dot at throat: ' + str(self.spike.rho[0]*self.spike.A_t*self.spike.V[0]))
+            print('m_dot at exit plane: ' + str(np.trapz(rho_grid*Ve_grid*dA,y_points)))
 
-            # print('thurst!')
-            # plt.plot(on_contour_x,on_contour_y,'x')
-            # plt.show()
-            # contour_der = interpolate.splev(on_contour_x,tck_contour,der=1)
-
-            # contour_angle = np.arctan(contour_der)
-            
-
-            # P_contour = interpolate.griddata((self.x,self.y),self.p,(on_contour_x,on_contour_y),method=approx_method) - self.p_atm
-
-            # P_2D = P_contour*np.sqrt(contour_der**2+1)*2*np.pi*np.sin(contour_angle)*2*np.pi*on_contour_y
-            # p_label = 'P ' + str(self.altitude) + ', patm:' + str(self.p_atm)
-            # plt.plot(y_points,np.cos(theta_grid),label =p_label)
-            # plt.legend()
-            #plt.show()
-            A = y_points*2*np.pi
-            thrust_grid = rho_grid*Ve_grid**2*A ## CHECK THIS!!!!!!!
-            thrust_momentum = np.trapz(thrust_grid,y_points) # check with emerson
-            #thrust_pressure = np.trapz((P_2D),on_contour_x) # check with emerson
-            thrust_pressure = np.trapz((P_grid-self.p_atm)*A,y_points)
+            return np.trapz((rho_grid*Ve_grid**2)*dA,y_points) # rho_grid*Ve_grid**2++(P_grid-self.p_atm)
 
         else:
             # Thrust plane
-            pass
+            interpolate.griddata((self.x,self.y),self.V,(x_plane,y_points),method=approx_method)
 
 
-        return thrust_momentum+ thrust_pressure
+        return thrust_momentum + thrust_pressure
         #FUN PLOTS
         # print(thrust_momentum)
         # print(thrust_pressure)

@@ -131,6 +131,7 @@ class plug_nozzle:
 		# F = m_dot*V_e + (P_e - P_o)A_e
 		p_e = self.p[-1]
 
+		print(p_e - p_atm)
 		thrust = self.rho[0]*self.V[0]*self.A_t*self.V[-1] + (p_e-p_atm)*self.A_e
 		return thrust 
 
@@ -200,6 +201,45 @@ class plug_nozzle:
 		with open('plug_csv/aerospike_converge_contour.csv','r') as original: data = original.read()
 		with open('plug_csv/aerospike_converge_contour.csv','w') as modified: modified.write('Converging x,Converging y\n' + data)
 
+
+
+if __name__ == '__main__':
+
+	## CONSTANTS OF DESIGN FOR AERODYNAMICS
+	r_e = 0.027 #0.034 # likely too large
+
+	## CONSTANTS OF DESIGN FOR HEAT FLUX
+	#user input variable in metric units:
+	T_w=600 #[K] desired temperature of nozzle 
+
+
+	## CONSTANTS OF SIM
+	alpha = 1#0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
+	beta = 0#1
+	design_alt = 9144
+	truncate_ratio = 1# bounds on truncate < 0.1425
+
+	gamma = 1.237 #np.mean([1.2534,1.2852])
+	T_c = 2831.47 # combustion chamber temperature
+	p_c = 3102640.8 # combustion chamber pressure
+	rho_c = 3.3826 # combustion chamber density 
+	a_c = np.sqrt(gamma*(1-1/gamma)*200.07*T_c) # combustion chamber sound speed
+	(p_atm,T_atm,rho_atm) = gd.standard_atmosphere([design_alt])
+
+	PR = p_c/p_atm
+
+	M_e = gd.PR_expansion_mach(PR,gamma)
+
+	expansion_ratio = gd.expansion_ratio(1,M_e,gamma)#6.64 #8.1273
+	# print('Exp. ratio: ' + str(expansion_ratio))
+	# print('PR: ' + str(PR))
+
+	A_t = r_e**2*np.pi/expansion_ratio # max expansion (r_b = 0, r_e**2 >= A_t*expansion_ratio/np.pi)
+
+
+	plug1 = plug_nozzle(expansion_ratio,A_t,r_e,gamma,T_c,p_c,a_c,rho_c,1000,truncate_ratio = 1)
+
+	plug_nozzle.calc_ideal_thrust(p_atm)
 ###
 # End of helper function / class descriptions
 ###

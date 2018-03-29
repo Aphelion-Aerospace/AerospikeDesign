@@ -369,10 +369,10 @@ if __name__ == '__main__':
 
 
 
-	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=200,no_alt_range = 600,no_core=4)
+	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=200,no_alt_range = 600,no_core=8)
 
 
-	optimizer.multicore_animate_range(downstream_factor=1.2,chr_mesh_n=200,no_core=4)
+	optimizer.multicore_animate_range(downstream_factor=1.2,chr_mesh_n=200,no_core=8)
 	# contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))
 
 	# print(optimizer.cost_opt_contour_params(contours))

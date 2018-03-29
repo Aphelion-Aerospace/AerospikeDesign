@@ -14,6 +14,7 @@ from heat_flux import heat_flux
 from plug_nozzle_angelino import plug_nozzle 
 import MOC
 import MOC_its
+import csvutil
 
 
 ## NASA CEA CONSTANTS
@@ -72,6 +73,11 @@ class aerospike_optimizer():
 		self.spike_opt = copy.deepcopy(self.spike_init)
 
 		self.CEA = CEA_constants(0)
+
+		### FOR ANIMATION ONLY WITH ACTUAL FLIGHT PARABOLA
+		data = csvutil.read_csv('altitude.csv')
+		#print(np.asarray(data))
+		self.parabolas_dict = csvutil.table_to_npwheaders(data)
 
 	def __compute_thrust_over_range(self,plug_nozzle_class,alt_range,gamma,send_end,downstream_factor=1.2,chr_mesh_n=50):
 		"""Function that computes the thrust at each point over a specified range, intended to be used as apart of a process
@@ -142,7 +148,11 @@ class aerospike_optimizer():
 		return plug_nozzle(expansion_ratio,A_t,r_e,CEA.gamma,CEA.T_c,CEA.p_c,CEA.a_c,CEA.rho_c,100,truncate_ratio = truncate_ratio)
 
 	def __cost_end_func(self,no_alt_range_int,spike,CEA,downstream_factor=1.2,chr_mesh_n=120,no_core=1):
-		alt_range = np.linspace(0,9144,no_alt_range_int)
+
+		# USUAL ALT_RANGE
+		#alt_range = np.linspace(0,9144,no_alt_range_int)
+
+		alt_range = self.parabolas_dict['aerospike']*0.3048
 
 		# shuffle arrays so each core computes similar complexity on average
 		np.random.shuffle(alt_range)
@@ -225,52 +235,60 @@ class aerospike_optimizer():
 	def animate_over_range(self,plug_nozzle_class,CEA,alt_range,flight_range,downstream_factor=1.2,chr_mesh_n=50):
 		
 		for i in range(alt_range.shape[0]):
+			#print('Graphing: ' + str(alt_range[i]))
+			matplotlib.rcParams.update({'font.size': 18})
 
-			fig, (ax1,ax2) = plt.subplots(1,2)#,gridspec_kw={'width_ratios':[8,1]})
-			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,CEA.gamma,alt_range[i],chr_mesh_n,downstream_factor=5,plot_chr=0,clean_mesh=1)
+			fig, (ax1,ax2) = plt.subplots(1,2,gridspec_kw={'width_ratios':[1.2,1]})
+			MOC_mesh = MOC.chr_mesh(plug_nozzle_class,CEA.gamma,alt_range[i],100,downstream_factor=downstream_factor,plot_chr=0,clean_mesh=1)
 		
 			plug_nozzle_class.plot_contour(ax1)
 			plug_nozzle_class.y = plug_nozzle_class.y*-1; plug_nozzle_class.lip_y = plug_nozzle_class.lip_y*-1
 			plug_nozzle_class.plot_contour(ax1)
 			ax1.plot([plug_nozzle_class.x[-1],plug_nozzle_class.x[-1]],[plug_nozzle_class.y[-1],plug_nozzle_class.y[-1]*-1],'b-')
-			ax1.set_ylim([-0.1,0.1])#ax1.set_ylim([-0.05,0.05])# 
-			ax1.set_xlim([-0.01,0.26])#ax1.set_xlim([-0.01,0.05])# 
+			# ax1.set_ylim([-0.1,0.1])#ax1.set_ylim([-0.05,0.05])# 
+			# ax1.set_xlim([-,0.15])#ax1.set_xlim([-0.01,0.05])# 
 
 			contourf_grid = 1000
 
 			x_plt = np.linspace(MOC_mesh.x.min(),MOC_mesh.x.max(),contourf_grid)
 			y_plt = np.linspace(MOC_mesh.y.min(),MOC_mesh.y.max(),contourf_grid)
 			X_plt,Y_plt = np.meshgrid(x_plt,y_plt)
-		
-			M_contour=interpolate.griddata((MOC_mesh.x,MOC_mesh.y),MOC_mesh.T,(X_plt,Y_plt),method='linear')
-			inner_contour_tck = interpolate.splrep(MOC_mesh.x[MOC_mesh.ID_contour_chr],MOC_mesh.y[MOC_mesh.ID_contour_chr])
-			def contour_curve(x):
-				return interpolate.splev(x,inner_contour_tck)
-			M_contour[Y_plt > contour_curve(X_plt)] = np.nan 
-
-			M_fill = ax1.contourf(X_plt,Y_plt,M_contour,cmap=cm.jet)
+			try:
+				M_contour=interpolate.griddata((MOC_mesh.x,MOC_mesh.y),MOC_mesh.M,(X_plt,Y_plt),method='linear')
+				inner_contour_tck = interpolate.splrep(MOC_mesh.x[MOC_mesh.ID_contour_chr],MOC_mesh.y[MOC_mesh.ID_contour_chr])
+				def contour_curve(x):
+					return interpolate.splev(x,inner_contour_tck)
+				M_contour[Y_plt > contour_curve(X_plt)] = np.nan 
+			except:
+				print('Spline Error at altitude: ' + str(alt_range[i]))
+			levels = [el for el in np.linspace(0,4,20)]
+			M_fill = ax1.contourf(X_plt,Y_plt,M_contour,levels,extend = 'max', cmap=cm.jet)
 
 			#v=np.linspace(0,5,10)
-			#ax1.contourf(X_plt,-1*Y_plt,M_contour,cmap=cm.jet)
-			plt.colorbar(M_fill,ax=ax1)
+			ax1.contourf(X_plt,-1*Y_plt,M_contour,levels,extend='max',cmap=cm.jet)
+			plt.colorbar(M_fill,ax=ax1,orientation = 'horizontal',ticks=[0,1,2,3,4])
 			#plt.clim(0,5)
-			name = 'animation_4_full_length_p/fig' + str(int(alt_range[i]))
+			name = 'animation_final/fig' + str(alt_range[i]).replace('.','_')
 			#title = str(int(alt_range[i]*3.28084)) + str('ft')
 			#plt.suptitle(title,fontsize=40)
-			ax1.set_aspect('equal','box')
+			matplotlib.rcParams.update({'font.size': 25})
 
 			#ax2.xaxis.set_visible(False); 
+			ax1.set_xlim([0,0.1])
+			ax1.set_ylim([-0.035,0.035])
 
-			x_flight = np.linspace(0,flight_range[i])
+			ax1.set_xticks([])
+			ax1.set_yticks([])
+			ax1.set_aspect('equal','box')
 
-			# ax2.plot(plug_nozzle_class.x*1000,plug_nozzle_class.T)
-			# ax2.set_xlabel('x (mm)')
-			# ax2.set_ylabel('Temperature (K)')
-			# ax2.plot(x_flight,60000*self.__fake_flight_parabola(x_flight))
-			# ax2.plot(flight_range[i],60000*self.__fake_flight_parabola(flight_range[i]),'rx')
-			# ax2.set_ylim([0,60000])
-			# ax2.set_yticks([0,10000,20000,30000,40000,50000,60000])
-			# ax2.set_xlim([0,1])
+			self.__actual_flight_parabola(alt_range[i]/0.3048,ax2)
+
+			ax2.set_ylim([0,16000])
+			ax2.set_xlabel('Time (s)')
+			ax2.set_ylabel('altitude (ft)')
+			ax2.set_yticks([0,4000,8000,12000,16000])
+			ax2.set_xlim([0,60])
+			ax2.set_xticks(np.linspace(0,60,7))
 			fig.set_size_inches(18.5,10.5)
 			plt.savefig(name,dpi=100)
 
@@ -280,11 +298,32 @@ class aerospike_optimizer():
 	def __fake_flight_parabola(self,x):
 		return -(x-1)**2 + 1	
 
+
+	def __actual_flight_parabola(self,alt,cax):
+		t = self.parabolas_dict['t']
+		aero = self.parabolas_dict['aerospike']
+		bell = self.parabolas_dict['bell']
+
+		aero_idx = aero <= alt 
+
+		bell_idx = bell > -1
+		bell_idx = np.logical_and(aero_idx,bell_idx)
+
+		
+		cax.plot(t[aero_idx],aero[aero_idx],'b-')
+		aero_point, = cax.plot(t[aero_idx][-1],aero[aero_idx][-1],'bx',label = 'Aerospike')
+
+		cax.plot(t[bell_idx],bell[bell_idx],'r-')
+		bell_point, = cax.plot(t[bell_idx][-1],bell[bell_idx][-1],'ro',label = 'Bell')
+		cax.legend(handles=[aero_point,bell_point],loc=2)
+
+
 	def multicore_animate_range(self,downstream_factor=1.2,chr_mesh_n=50,no_core=1):
  #3.28084
 
-		alt_range = np.linspace(0,16764,self.no_alt_range_int)
-		flight_range = np.linspace(0,1,self.no_alt_range_int)
+		alt_range = self.parabolas_dict['aerospike'][:-1]*0.3048
+
+		flight_range = alt_range
 		rand_idx = np.random.permutation(len(alt_range))
 		alt_range = alt_range[rand_idx]; flight_range = flight_range[rand_idx]
 
@@ -324,13 +363,14 @@ if __name__ == '__main__':
 	alpha = 0.07/8 # 0.07/8 : 1 ratio of alpha : beta gives very similar weights
 	beta = 1
 	design_alt = 9144
-	truncate_ratio = 0.2# bounds on truncate < 0.1425
+	truncate_ratio = 1.0# bounds on truncate < 0.1425
 
 	CEA = CEA_constants(0) # not a functioning class as of now
 
 
 
 	optimizer = aerospike_optimizer(r_e,T_w,alpha,beta,design_alt,truncate_ratio,chr_mesh_n=200,no_alt_range = 600,no_core=4)
+
 
 	optimizer.multicore_animate_range(downstream_factor=1.2,chr_mesh_n=200,no_core=4)
 	# contours = np.concatenate((optimizer.spike_opt.x,optimizer.spike_opt.y))
